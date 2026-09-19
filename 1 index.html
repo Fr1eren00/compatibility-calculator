@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Калькулятор совместимости</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    min-height: 100vh;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: linear-gradient(160deg, #ffe4ee 0%, #ffd6e7 40%, #ffc9de 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* ---------- Фоновые сердечки ---------- */
+  #hearts {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 0;
+  }
+  .heart {
+    position: absolute;
+    bottom: -60px;
+    color: #ff8fb8;
+    animation-name: floatUp;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    opacity: 0;
+    user-select: none;
+  }
+  @keyframes floatUp {
+    0%   { transform: translateY(0) rotate(0deg) scale(0.8);   opacity: 0; }
+    10%  { opacity: .9; }
+    90%  { opacity: .5; }
+    100% { transform: translateY(-115vh) rotate(40deg) scale(1.2); opacity: 0; }
+  }
+
+  /* ---------- Карточка ---------- */
+  .container {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 520px;
+    background: rgba(255, 255, 255, 0.82);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 28px;
+    padding: 36px 28px 32px;
+    box-shadow: 0 20px 50px rgba(255, 120, 170, .35),
+                0 4px 12px rgba(255, 120, 170, .15);
+    border: 1px solid rgba(255, 255, 255, .9);
+    text-align: center;
+  }
+
+  h1 {
+    font-size: 1.7rem;
+    color: #d6337c;
+    margin-bottom: 6px;
+    letter-spacing: .5px;
+  }
+  .subtitle {
+    color: #b56b8f;
+    font-size: .9rem;
+    margin-bottom: 24px;
+  }
+
+  input {
+    width: 100%;
+    padding: 14px 18px;
+    border-radius: 14px;
+    border: 2px solid #ffd0e0;
+    background: #fff;
+    font-size: 1rem;
+    color: #7a3a56;
+    outline: none;
+    transition: .25s;
+    margin-bottom: 12px;
+    text-align: center;
+  }
+  input::placeholder { color: #e3a7bf; }
+  input:focus {
+    border-color: #ff9ec4;
+    box-shadow: 0 0 0 4px rgba(255, 158, 196, .25);
+  }
+
+  button {
+    width: 100%;
+    padding: 15px;
+    margin-top: 6px;
+    border: none;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #ff9ec4, #ff6fa8);
+    color: #fff;
+    font-size: 1.05rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: .25s;
+    box-shadow: 0 8px 20px rgba(255, 111, 168, .45);
+  }
+  button:hover  { transform: translateY(-2px); box-shadow: 0 12px 26px rgba(255, 111, 168, .55); }
+  button:active { transform: translateY(0); }
+
+  /* ---------- Результат ---------- */
+  #result {
+    margin-top: 24px;
+    overflow: hidden;
+  }
+  .percent {
+    font-size: 3.4rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #ff5c9d, #d6337c);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    line-height: 1.1;
+  }
+  .percent-label {
+    color: #b56b8f;
+    font-size: .95rem;
+    margin-bottom: 8px;
+  }
+  .bar {
+    height: 12px;
+    background: #ffe0ec;
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 14px 0 4px;
+  }
+  .bar-fill {
+    height: 100%;
+    width: 0;
+    background: linear-gradient(90deg, #ffa8cb, #ff5c9d);
+    border-radius: 10px;
+    transition: width 1s cubic-bezier(.22, 1, .36, 1);
+  }
+  .verdict {
+    color: #c9538a;
+    font-size: .95rem;
+    margin-top: 8px;
+  }
+
+  /* ---------- Таймер ---------- */
+  #timer {
+    margin-top: 26px;
+    padding-top: 22px;
+    border-top: 2px dashed #ffd0e0;
+    display: none;
+  }
+  #timer.show {
+    display: block;
+    animation: fadeIn .6s ease;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: none; }
+  }
+  #timer h2 {
+    font-size: 1.15rem;
+    color: #d6337c;
+    margin-bottom: 4px;
+  }
+  #timer .since {
+    font-size: .8rem;
+    color: #b56b8f;
+    margin-bottom: 16px;
+  }
+  .timer-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  }
+  .timer-cell {
+    background: linear-gradient(160deg, #fff, #ffeef5);
+    border: 1px solid #ffd0e0;
+    border-radius: 16px;
+    padding: 14px 4px 10px;
+    box-shadow: 0 4px 10px rgba(255, 150, 190, .18);
+  }
+  .timer-cell .num {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #e0417f;
+    font-variant-numeric: tabular-nums;
+  }
+  .timer-cell .unit {
+    display: block;
+    font-size: .72rem;
+    color: #b56b8f;
+    margin-top: 4px;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+  }
+
+  @media (max-width: 420px) {
+    .percent { font-size: 2.6rem; }
+    .timer-cell .num { font-size: 1.15rem; }
+    h1 { font-size: 1.4rem; }
+  }
+</style>
+</head>
+<body>
+
+  <div id="hearts"></div>
+
+  <div class="container">
+    <h1>Калькулятор совместимости</h1>
+    <p class="subtitle">Введите два имени и узнайте свою судьбу 💗</p>
+
+    <input id="name1" type="text" placeholder="Первое имя" autocomplete="off">
+    <input id="name2" type="text" placeholder="Второе имя" autocomplete="off">
+    <button id="calcBtn">Рассчитать совместимость</button>
+
+    <div id="result"></div>
+
+    <div id="timer">
+      <h2>Мы вместе уже 💞</h2>
+      <p class="since">с 30 августа 2026, 21:00</p>
+      <div class="timer-grid">
+        <div class="timer-cell"><span class="num" id="t-days">0</span><span class="unit">дней</span></div>
+        <div class="timer-cell"><span class="num" id="t-hours">0</span><span class="unit">часов</span></div>
+        <div class="timer-cell"><span class="num" id="t-mins">0</span><span class="unit">минут</span></div>
+        <div class="timer-cell"><span class="num" id="t-secs">0</span><span class="unit">секунд</span></div>
+      </div>
+    </div>
+  </div>
+
+<script>
+/* ================= ФОНОВЫЕ СЕРДЕЧКИ ================= */
+(function makeHearts() {
+  const wrap = document.getElementById('hearts');
+  const glyphs = ['♥', '💗', '💖', '💕', '❤'];
+  const count = 22;
+
+  for (let i = 0; i < count; i++) {
+    const h = document.createElement('span');
+    h.className = 'heart';
+    h.textContent = glyphs[Math.floor(Math.random() * glyphs.length)];
+    h.style.left = Math.random() * 100 + 'vw';
+    h.style.fontSize = (14 + Math.random() * 26) + 'px';
+    h.style.animationDuration = (9 + Math.random() * 12) + 's';
+    h.style.animationDelay = (-Math.random() * 20) + 's';
+    wrap.appendChild(h);
+  }
+})();
+
+/* ================= ЛОГИКА СОВМЕСТИМОСТИ ================= */
+const PAIRS = [
+  [['катя', 'матвей'],    99.7],
+  [['катя', 'аня'],       69],
+  [['дима', 'дима'],      67],
+  [['артем', 'тимофей'],  0.5],
+  [['дима', 'аня'],       50]
+];
+
+// нормализация: регистр, ё → е, лишние пробелы
+function norm(s) {
+  return (s || '')
+    .toLowerCase()
+    .replace(/ё/g, 'е')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+// поиск значения вне зависимости от порядка имён
+function getCompatibility(a, b) {
+  for (const [[x, y], value] of PAIRS) {
+    if ((a === x && b === y) || (a === y && b === x)) return value;
+  }
+  return 0;
+}
+
+// 99.7 -> "99,7%", 69 -> "69%"
+function formatPercent(v) {
+  const s = Number.isInteger(v) ? String(v) : v.toFixed(1).replace('.', ',');
+  return s + '%';
+}
+
+function verdictFor(v) {
+  if (v === 0)  return 'Увы, искры пока не видно…';
+  if (v < 1)    return 'Почти ничего, но вдруг?';
+  if (v < 50)   return 'Есть шанс, если постараться.';
+  if (v < 70)   return 'Неплохо! Что-то определённо есть.';
+  if (v < 95)   return 'Отличная пара! 💕';
+  return 'Идеальная совместимость! 💞';
+}
+
+/* ================= ТАЙМЕР ================= */
+// 30.08.2026 21:00 (в JS месяцы с 0 → август = 7)
+const START_DATE = new Date(2026, 7, 30, 21, 0, 0);
+
+function updateTimer() {
+  let diff = Date.now() - START_DATE.getTime();
+  if (diff < 0) diff = 0;
+
+  const totalSec = Math.floor(diff / 1000);
+  const days  = Math.floor(totalSec / 86400);
+  const hours = Math.floor((totalSec % 86400) / 3600);
+  const mins  = Math.floor((totalSec % 3600) / 60);
+  const secs  = totalSec % 60;
+
+  document.getElementById('t-days').textContent  = days;
+  document.getElementById('t-hours').textContent = String(hours).padStart(2, '0');
+  document.getElementById('t-mins').textContent  = String(mins).padStart(2, '0');
+  document.getElementById('t-secs').textContent  = String(secs).padStart(2, '0');
+}
+
+let timerInterval = null;
+function startTimer() {
+  updateTimer();
+  if (timerInterval) clearInterval(timerInterval);
+  timerInterval = setInterval(updateTimer, 1000);
+}
+
+/* ================= ОСНОВНАЯ ФУНКЦИЯ ================= */
+const resultBox = document.getElementById('result');
+const timerBox  = document.getElementById('timer');
+
+function calculate() {
+  const n1 = norm(document.getElementById('name1').value);
+  const n2 = norm(document.getElementById('name2').value);
+
+  if (!n1 || !n2) {
+    resultBox.innerHTML = '<p class="verdict">Введите оба имени, пожалуйста 🙏</p>';
+    timerBox.classList.remove('show');
+    if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+    return;
+  }
+
+  const value = getCompatibility(n1, n2);
+
+  resultBox.innerHTML = `
+    <div class="percent-label">Совместимость</div>
+    <div class="percent">${formatPercent(value)}</div>
+    <div class="bar"><div class="bar-fill" id="barFill"></div></div>
+    <p class="verdict">${verdictFor(value)}</p>
+  `;
+
+  // анимация полоски
+  requestAnimationFrame(() => {
+    const fill = document.getElementById('barFill');
+    if (fill) setTimeout(() => { fill.style.width = value + '%'; }, 50);
+  });
+
+  // таймер только для пары Катя + Матвей
+  const isKatyaMatvey =
+    (n1 === 'катя' && n2 === 'матвей') ||
+    (n1 === 'матвей' && n2 === 'катя');
+
+  if (isKatyaMatvey) {
+    timerBox.classList.add('show');
+    startTimer();
+  } else {
+    timerBox.classList.remove('show');
+    if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+  }
+}
+
+document.getElementById('calcBtn').addEventListener('click', calculate);
+document.getElementById('name1').addEventListener('keydown', e => { if (e.key === 'Enter') calculate(); });
+document.getElementById('name2').addEventListener('keydown', e => { if (e.key === 'Enter') calculate(); });
+</script>
+</body>
+</html>
