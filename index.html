@@ -5,23 +5,86 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Калькулятор совместимости</title>
 <style>
+  :root {
+    --bg-1: #ffe4ee;
+    --bg-2: #ffd6e7;
+    --bg-3: #ffc9de;
+    --card-bg: rgba(255,255,255,0.82);
+    --card-border: rgba(255,255,255,0.9);
+    --text-main: #7a3a56;
+    --text-sub: #b56b8f;
+    --accent: #d6337c;
+    --input-bg: #ffffff;
+    --input-border: #ffd0e0;
+    --input-focus: #ff9ec4;
+    --bar-bg: #ffe0ec;
+    --heart-bg: #ff8fb8;
+    --timer-cell-bg-1: #ffffff;
+    --timer-cell-bg-2: #ffeef5;
+    --timer-cell-border: #ffd0e0;
+    --timer-num: #e0417f;
+    --dashed: #ffd0e0;
+    --shadow: 0 20px 50px rgba(255, 120, 170, .35), 0 4px 12px rgba(255, 120, 170, .15);
+  }
+  [data-theme="dark"] {
+    --bg-1: #2a0f1d;
+    --bg-2: #3d1529;
+    --bg-3: #4d1a33;
+    --card-bg: rgba(60, 24, 42, 0.72);
+    --card-border: rgba(255, 158, 196, 0.15);
+    --text-main: #ffd0e0;
+    --text-sub: #e3a7bf;
+    --accent: #ff7eb0;
+    --input-bg: rgba(255,255,255,0.07);
+    --input-border: rgba(255, 158, 196, 0.3);
+    --input-focus: #ff7eb0;
+    --bar-bg: rgba(255, 208, 224, 0.15);
+    --heart-bg: #ff6fa8;
+    --timer-cell-bg-1: rgba(80, 30, 55, 0.6);
+    --timer-cell-bg-2: rgba(100, 35, 65, 0.6);
+    --timer-cell-border: rgba(255, 158, 196, 0.2);
+    --timer-num: #ff8fc0;
+    --dashed: rgba(255, 158, 196, 0.3);
+    --shadow: 0 20px 50px rgba(0, 0, 0, .5), 0 4px 12px rgba(0, 0, 0, .3);
+  }
+
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
     min-height: 100vh;
     font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-    background: linear-gradient(160deg, #ffe4ee 0%, #ffd6e7 40%, #ffc9de 100%);
+    background: linear-gradient(160deg, var(--bg-1) 0%, var(--bg-2) 40%, var(--bg-3) 100%);
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 20px;
     overflow-x: hidden;
     position: relative;
+    transition: background .5s;
   }
 
-  #hearts {
+  #themeToggle {
     position: fixed;
-    inset: 0;
+    top: 20px; right: 20px;
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    border: 2px solid var(--card-border);
+    background: var(--card-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    font-size: 1.3rem;
+    cursor: pointer;
+    z-index: 100;
+    transition: .3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(255, 120, 170, .25);
+  }
+  #themeToggle:hover { transform: scale(1.1) rotate(15deg); }
+
+  #hearts {
+    position: fixed; inset: 0;
     pointer-events: none;
     overflow: hidden;
     z-index: 0;
@@ -29,12 +92,13 @@
   .heart {
     position: absolute;
     bottom: -60px;
-    color: #ff8fb8;
+    color: var(--heart-bg);
     animation-name: floatUp;
     animation-timing-function: linear;
     animation-iteration-count: infinite;
     opacity: 0;
     user-select: none;
+    transition: color .5s;
   }
   @keyframes floatUp {
     0%   { transform: translateY(0) rotate(0deg) scale(0.8);   opacity: 0; }
@@ -47,50 +111,52 @@
     position: relative;
     z-index: 1;
     width: 100%;
-    max-width: 520px;
-    background: rgba(255, 255, 255, 0.82);
+    max-width: 560px;
+    background: var(--card-bg);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     border-radius: 28px;
     padding: 36px 28px 32px;
-    box-shadow: 0 20px 50px rgba(255, 120, 170, .35),
-                0 4px 12px rgba(255, 120, 170, .15);
-    border: 1px solid rgba(255, 255, 255, .9);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--card-border);
     text-align: center;
+    transition: background .5s, border-color .5s;
   }
 
   h1 {
     font-size: 1.7rem;
-    color: #d6337c;
+    color: var(--accent);
     margin-bottom: 6px;
     letter-spacing: .5px;
+    transition: color .5s;
   }
   .subtitle {
-    color: #b56b8f;
+    color: var(--text-sub);
     font-size: .9rem;
     margin-bottom: 24px;
+    transition: color .5s;
   }
 
   input {
     width: 100%;
     padding: 14px 18px;
     border-radius: 14px;
-    border: 2px solid #ffd0e0;
-    background: #fff;
+    border: 2px solid var(--input-border);
+    background: var(--input-bg);
     font-size: 1rem;
-    color: #7a3a56;
+    color: var(--text-main);
     outline: none;
     transition: .25s;
     margin-bottom: 12px;
     text-align: center;
   }
-  input::placeholder { color: #e3a7bf; }
+  input::placeholder { color: var(--text-sub); opacity: .6; }
   input:focus {
-    border-color: #ff9ec4;
+    border-color: var(--input-focus);
     box-shadow: 0 0 0 4px rgba(255, 158, 196, .25);
   }
 
-  button {
+  button.main-btn {
     width: 100%;
     padding: 15px;
     margin-top: 6px;
@@ -104,13 +170,11 @@
     transition: .25s;
     box-shadow: 0 8px 20px rgba(255, 111, 168, .45);
   }
-  button:hover  { transform: translateY(-2px); box-shadow: 0 12px 26px rgba(255, 111, 168, .55); }
-  button:active { transform: translateY(0); }
+  button.main-btn:hover  { transform: translateY(-2px); box-shadow: 0 12px 26px rgba(255, 111, 168, .55); }
+  button.main-btn:active { transform: translateY(0); }
 
-  #result {
-    margin-top: 24px;
-    overflow: hidden;
-  }
+  #result { margin-top: 24px; overflow: hidden; }
+
   .percent {
     font-size: 3.4rem;
     font-weight: 800;
@@ -119,55 +183,83 @@
     background-clip: text;
     color: transparent;
     line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+    transition: background .5s;
   }
   .percent-label {
-    color: #b56b8f;
+    color: var(--text-sub);
     font-size: .95rem;
     margin-bottom: 8px;
+    transition: color .5s;
   }
   .bar {
     height: 12px;
-    background: #ffe0ec;
+    background: var(--bar-bg);
     border-radius: 10px;
     overflow: hidden;
     margin: 14px 0 4px;
+    transition: background .5s;
   }
   .bar-fill {
     height: 100%;
     width: 0;
     background: linear-gradient(90deg, #ffa8cb, #ff5c9d);
     border-radius: 10px;
-    transition: width 1s cubic-bezier(.22, 1, .36, 1);
+    transition: width 1.2s cubic-bezier(.22, 1, .36, 1), background .5s;
   }
   .verdict {
-    color: #c9538a;
+    color: var(--text-sub);
     font-size: .95rem;
     margin-top: 8px;
+    transition: color .5s;
   }
 
+  .share-btn {
+    margin-top: 16px;
+    padding: 11px 20px;
+    border: 2px solid var(--input-border);
+    background: transparent;
+    color: var(--accent);
+    border-radius: 12px;
+    font-size: .92rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: .25s;
+  }
+  .share-btn:hover {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+
+  /* Таймер */
   #timer {
     margin-top: 26px;
     padding-top: 22px;
-    border-top: 2px dashed #ffd0e0;
-    display: none;
+    border-top: 2px dashed var(--dashed);
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: opacity .5s ease, max-height .8s ease, padding-top .5s, margin-top .5s, border-color .5s;
   }
   #timer.show {
-    display: block;
-    animation: fadeIn .6s ease;
+    opacity: 1;
+    max-height: 1400px;
   }
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to   { opacity: 1; transform: none; }
-  }
+  .timer-section { margin-bottom: 22px; }
+  .timer-section:last-child { margin-bottom: 0; }
+
   #timer h2 {
-    font-size: 1.15rem;
-    color: #d6337c;
+    font-size: 1.1rem;
+    color: var(--accent);
     margin-bottom: 4px;
+    transition: color .5s;
   }
   #timer .since {
     font-size: .8rem;
-    color: #b56b8f;
-    margin-bottom: 16px;
+    color: var(--text-sub);
+    margin-bottom: 14px;
+    transition: color .5s;
   }
   .timer-grid {
     display: grid;
@@ -175,69 +267,137 @@
     gap: 10px;
   }
   .timer-cell {
-    background: linear-gradient(160deg, #fff, #ffeef5);
-    border: 1px solid #ffd0e0;
+    background: linear-gradient(160deg, var(--timer-cell-bg-1), var(--timer-cell-bg-2));
+    border: 1px solid var(--timer-cell-border);
     border-radius: 16px;
     padding: 14px 4px 10px;
     box-shadow: 0 4px 10px rgba(255, 150, 190, .18);
+    transition: background .5s, border-color .5s;
   }
   .timer-cell .num {
     display: block;
     font-size: 1.5rem;
     font-weight: 800;
-    color: #e0417f;
+    color: var(--timer-num);
     font-variant-numeric: tabular-nums;
+    transition: color .5s;
   }
   .timer-cell .unit {
     display: block;
     font-size: .72rem;
-    color: #b56b8f;
+    color: var(--text-sub);
     margin-top: 4px;
     text-transform: uppercase;
     letter-spacing: .5px;
+    transition: color .5s;
+  }
+
+  /* Взрыв сердечек */
+  .burst-heart {
+    position: absolute;
+    pointer-events: none;
+    z-index: 100;
+    animation: burst 1.3s ease-out forwards;
+    will-change: transform, opacity;
+  }
+  @keyframes burst {
+    0% {
+      transform: translate(-50%, -50%) scale(.3) rotate(0deg);
+      opacity: 1;
+    }
+    100% {
+      transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(1.1) rotate(var(--rot));
+      opacity: 0;
+    }
   }
 
   @media (max-width: 420px) {
     .percent { font-size: 2.6rem; }
     .timer-cell .num { font-size: 1.15rem; }
     h1 { font-size: 1.4rem; }
+    #themeToggle { top: 12px; right: 12px; width: 42px; height: 42px; font-size: 1.1rem; }
   }
 </style>
 </head>
 <body>
 
+  <button id="themeToggle" title="Переключить тему">🌙</button>
   <div id="hearts"></div>
 
-  <div class="container">
+  <div class="container" id="card">
     <h1>Калькулятор совместимости</h1>
     <p class="subtitle">Введите два имени и узнайте свою судьбу 💗</p>
 
     <input id="name1" type="text" placeholder="Первое имя" autocomplete="off">
     <input id="name2" type="text" placeholder="Второе имя" autocomplete="off">
-    <button id="calcBtn">Рассчитать совместимость</button>
+    <button id="calcBtn" class="main-btn">Рассчитать совместимость</button>
 
     <div id="result"></div>
 
     <div id="timer">
-      <h2>Мы вместе уже 💞</h2>
-      <p class="since">с 30 августа 2026, 21:00</p>
-      <div class="timer-grid">
-        <div class="timer-cell"><span class="num" id="t-days">0</span><span class="unit">дней</span></div>
-        <div class="timer-cell"><span class="num" id="t-hours">0</span><span class="unit">часов</span></div>
-        <div class="timer-cell"><span class="num" id="t-mins">0</span><span class="unit">минут</span></div>
-        <div class="timer-cell"><span class="num" id="t-secs">0</span><span class="unit">секунд</span></div>
+      <div class="timer-section">
+        <h2>Мы вместе уже 💞</h2>
+        <p class="since">с 30 августа 2026, 21:00</p>
+        <div class="timer-grid">
+          <div class="timer-cell"><span class="num" id="t-days">0</span><span class="unit">дней</span></div>
+          <div class="timer-cell"><span class="num" id="t-hours">00</span><span class="unit">часов</span></div>
+          <div class="timer-cell"><span class="num" id="t-mins">00</span><span class="unit">минут</span></div>
+          <div class="timer-cell"><span class="num" id="t-secs">00</span><span class="unit">секунд</span></div>
+        </div>
+      </div>
+
+      <div class="timer-section">
+        <h2>До дня рождения Кати 🎂</h2>
+        <p class="since">21 ноября · <span id="katya-age">…</span></p>
+        <div class="timer-grid">
+          <div class="timer-cell"><span class="num" id="k-days">0</span><span class="unit">дней</span></div>
+          <div class="timer-cell"><span class="num" id="k-hours">00</span><span class="unit">часов</span></div>
+          <div class="timer-cell"><span class="num" id="k-mins">00</span><span class="unit">минут</span></div>
+          <div class="timer-cell"><span class="num" id="k-secs">00</span><span class="unit">секунд</span></div>
+        </div>
+      </div>
+
+      <div class="timer-section">
+        <h2>До дня рождения Матвея 🎂</h2>
+        <p class="since">14 ноября · <span id="matvey-age">…</span></p>
+        <div class="timer-grid">
+          <div class="timer-cell"><span class="num" id="m-days">0</span><span class="unit">дней</span></div>
+          <div class="timer-cell"><span class="num" id="m-hours">00</span><span class="unit">часов</span></div>
+          <div class="timer-cell"><span class="num" id="m-mins">00</span><span class="unit">минут</span></div>
+          <div class="timer-cell"><span class="num" id="m-secs">00</span><span class="unit">секунд</span></div>
+        </div>
       </div>
     </div>
   </div>
 
 <script>
+/* ================= ТЕМА ================= */
+(function initTheme() {
+  const saved = localStorage.getItem('theme');
+  if (saved === 'dark') {
+    document.documentElement.setAttribute('data-theme', 'dark');
+    document.getElementById('themeToggle').textContent = '☀️';
+  }
+})();
+
+document.getElementById('themeToggle').addEventListener('click', () => {
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  if (isDark) {
+    document.documentElement.removeAttribute('data-theme');
+    localStorage.setItem('theme', 'light');
+    document.getElementById('themeToggle').textContent = '🌙';
+  } else {
+    document.documentElement.setAttribute('data-theme', 'dark');
+    localStorage.setItem('theme', 'dark');
+    document.getElementById('themeToggle').textContent = '☀️';
+  }
+});
+
 /* ================= ФОНОВЫЕ СЕРДЕЧКИ ================= */
 (function makeHearts() {
   const wrap = document.getElementById('hearts');
   const glyphs = ['♥', '💗', '💖', '💕', '❤'];
-  const count = 22;
-
-  for (let i = 0; i < count; i++) {
+  for (let i = 0; i < 22; i++) {
     const h = document.createElement('span');
     h.className = 'heart';
     h.textContent = glyphs[Math.floor(Math.random() * glyphs.length)];
@@ -250,8 +410,6 @@
 })();
 
 /* ================= ДАННЫЕ ================= */
-
-// Совместимость. Порядок имён внутри пары не важен.
 const PAIRS = [
   [['катя', 'матвей'],    99.7],
   [['катя', 'аня'],       69],
@@ -260,51 +418,20 @@ const PAIRS = [
   [['дима', 'аня'],       50]
 ];
 
-// Синонимы: любые варианты имени → одна каноническая форма.
-// ВАЖНО: ключи пишем без буквы "ё" (она заменяется на "е" ДО обращения к словарю).
 const ALIASES = {
-  // Екатерина → катя
-  'екатерина': 'катя',
-  'катерина':  'катя',
-  'катюша':    'катя',
-  'катюха':    'катя',
-  'кет':       'катя',
-
-  // Дмитрий → дима
-  'дмитрий':   'дима',
-  'димон':     'дима',
-  'димыч':     'дима',
-  'димуля':    'дима',
-
-  // Артём / Тёма → артем
-  'тема':      'артем',
-  'темка':     'артем',
-  'темочка':   'артем',
-  'артемий':   'артем',
-
-  // Аня
-  'анюта':     'аня',
-  'анюша':     'аня',
-  'анна':      'аня',
-
-  // Матвей
-  'матя':      'матвей',
-  'матюша':    'матвей'
+  'екатерина': 'катя', 'катерина': 'катя', 'катюша': 'катя', 'катюха': 'катя', 'кет': 'катя',
+  'дмитрий':   'дима', 'димон':    'дима', 'димыч':  'дима', 'димуля': 'дима',
+  'тема':      'артем','темка':    'артем','темочка':'артем','артемий':'артем',
+  'анюта':     'аня',  'анюша':    'аня',  'анна':   'аня',
+  'матя':      'матвей','матюша':  'матвей'
 };
 
 /* ================= ЛОГИКА ================= */
-
-// нормализация: регистр, ё → е, лишние пробелы, синонимы
 function norm(s) {
-  const v = (s || '')
-    .toLowerCase()
-    .replace(/ё/g, 'е')
-    .replace(/\s+/g, ' ')
-    .trim();
+  const v = (s || '').toLowerCase().replace(/ё/g, 'е').replace(/\s+/g, ' ').trim();
   return ALIASES[v] || v;
 }
 
-// поиск значения вне зависимости от порядка имён
 function getCompatibility(a, b) {
   for (const [[x, y], value] of PAIRS) {
     if ((a === x && b === y) || (a === y && b === x)) return value;
@@ -312,55 +439,274 @@ function getCompatibility(a, b) {
   return 0;
 }
 
-// 99.7 -> "99,7%", 69 -> "69%"
 function formatPercent(v) {
   const s = Number.isInteger(v) ? String(v) : v.toFixed(1).replace('.', ',');
   return s + '%';
 }
 
+// Пункт 2: расширенный список вердиктов
 function verdictFor(v) {
-  if (v === 0)  return 'Увы, искры пока не видно…';
-  if (v < 1)    return 'Почти ничего, но вдруг?';
-  if (v < 50)   return 'Есть шанс, если постараться.';
+  if (v === 0)  return 'Увы, искры пока не видно… но всё впереди!';
+  if (v < 1)    return 'Почти ничего, но вдруг это знак?';
+  if (v < 10)   return 'Совсем чуть-чуть. Зато есть куда расти.';
+  if (v < 25)   return 'Есть шанс, если сильно постараться.';
+  if (v < 50)   return 'Маленькая искра уже теплится.';
+  if (v < 60)   return 'Половина успеха — уже неплохо!';
   if (v < 70)   return 'Неплохо! Что-то определённо есть.';
-  if (v < 95)   return 'Отличная пара! 💕';
+  if (v < 80)   return 'Хорошая пара — вам точно не скучно.';
+  if (v < 90)   return 'Отличная пара! 💕';
+  if (v < 95)   return 'Очень сильная связь! 💖';
+  if (v < 99)   return 'Почти идеал — берегите друг друга!';
   return 'Идеальная совместимость! 💞';
 }
 
-/* ================= ТАЙМЕР ================= */
-// 30.08.2026 21:00 (месяцы в JS с 0 → август = 7)
-const START_DATE = new Date(2026, 7, 30, 21, 0, 0);
+// Пункт 4: цвет в зависимости от значения
+function colorsForValue(v) {
+  if (v === 0)  return { from: '#b9a7b3', to: '#9b8794' };
+  if (v < 25)   return { from: '#d4a5b8', to: '#b58ba0' };
+  if (v < 50)   return { from: '#ffa8cb', to: '#ff7eb0' };
+  if (v < 80)   return { from: '#ff5c9d', to: '#e0417f' };
+  if (v < 95)   return { from: '#ff3d8a', to: '#c72a6e' };
+  return { from: '#ffb347', to: '#ff5c9d' }; // золотой градиент
+}
 
-function updateTimer() {
-  let diff = Date.now() - START_DATE.getTime();
+/* ================= ТАЙМЕРЫ ================= */
+const START_DATE    = new Date(2026, 7, 30, 21, 0, 0); // 30.08.2026 21:00
+const KATYA_BIRTH   = { year: 2008, month: 11, day: 21 };
+const MATVEY_BIRTH  = { year: 2008, month: 11, day: 14 };
+
+function nextBirthday(month, day) {
+  const now = new Date();
+  let bd = new Date(now.getFullYear(), month - 1, day, 0, 0, 0);
+  if (bd.getTime() < now.getTime()) {
+    bd = new Date(now.getFullYear() + 1, month - 1, day, 0, 0, 0);
+  }
+  return bd;
+}
+
+function calcAge(birth) {
+  const now = new Date();
+  let a = now.getFullYear() - birth.year;
+  const m = now.getMonth() + 1;
+  if (m < birth.month || (m === birth.month && now.getDate() < birth.day)) a--;
+  return a;
+}
+
+function splitDiff(diff) {
   if (diff < 0) diff = 0;
-
   const totalSec = Math.floor(diff / 1000);
-  const days  = Math.floor(totalSec / 86400);
-  const hours = Math.floor((totalSec % 86400) / 3600);
-  const mins  = Math.floor((totalSec % 3600) / 60);
-  const secs  = totalSec % 60;
+  return {
+    d: Math.floor(totalSec / 86400),
+    h: Math.floor((totalSec % 86400) / 3600),
+    m: Math.floor((totalSec % 3600) / 60),
+    s: totalSec % 60
+  };
+}
 
-  document.getElementById('t-days').textContent  = days;
-  document.getElementById('t-hours').textContent = String(hours).padStart(2, '0');
-  document.getElementById('t-mins').textContent  = String(mins).padStart(2, '0');
-  document.getElementById('t-secs').textContent  = String(secs).padStart(2, '0');
+function pad(n) { return String(n).padStart(2, '0'); }
+
+function renderTimer(prefix, diff) {
+  const t = splitDiff(diff);
+  document.getElementById(prefix + '-days').textContent  = t.d;
+  document.getElementById(prefix + '-hours').textContent = pad(t.h);
+  document.getElementById(prefix + '-mins').textContent  = pad(t.m);
+  document.getElementById(prefix + '-secs').textContent  = pad(t.s);
+}
+
+function updateAllTimers() {
+  const now = Date.now();
+  renderTimer('t', now - START_DATE.getTime());
+  renderTimer('k', nextBirthday(KATYA_BIRTH.month, KATYA_BIRTH.day).getTime() - now);
+  renderTimer('m', nextBirthday(MATVEY_BIRTH.month, MATVEY_BIRTH.day).getTime() - now);
+
+  document.getElementById('katya-age').textContent   = 'исполнится ' + (calcAge(KATYA_BIRTH) + 1);
+  document.getElementById('matvey-age').textContent  = 'исполнится ' + (calcAge(MATVEY_BIRTH) + 1);
 }
 
 let timerInterval = null;
 function startTimer() {
-  updateTimer();
+  updateAllTimers();
   if (timerInterval) clearInterval(timerInterval);
-  timerInterval = setInterval(updateTimer, 1000);
+  timerInterval = setInterval(updateAllTimers, 1000);
+}
+
+/* ================= ПУНКТ 1: ВЗРЫВ СЕРДЕЧЕК ================= */
+function heartBurst(container) {
+  const rect = container.getBoundingClientRect();
+  const cx = rect.width / 2;
+  const cy = rect.height / 3;
+  const emojis = ['💗', '💖', '💕', '❤️', '💞', '💘'];
+  const count = 32;
+
+  for (let i = 0; i < count; i++) {
+    const h = document.createElement('span');
+    h.className = 'burst-heart';
+    h.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+    h.style.left = cx + 'px';
+    h.style.top  = cy + 'px';
+
+    const angle = Math.random() * Math.PI * 2;
+    const dist  = 80 + Math.random() * 240;
+    h.style.setProperty('--tx', (Math.cos(angle) * dist).toFixed(1) + 'px');
+    h.style.setProperty('--ty', (Math.sin(angle) * dist).toFixed(1) + 'px');
+    h.style.setProperty('--rot', (Math.random() * 360 - 180) + 'deg');
+    h.style.fontSize = (14 + Math.random() * 22) + 'px';
+
+    container.appendChild(h);
+    setTimeout(() => h.remove(), 1400);
+  }
+}
+
+/* ================= ПУНКТ 3: АНИМАЦИЯ НАКРУТКИ ЧИСЛА ================= */
+function animatePercent(el, target) {
+  const duration = 1500;
+  const start = performance.now();
+
+  function tick(now) {
+    const p = Math.min((now - start) / duration, 1);
+    const eased = 1 - Math.pow(1 - p, 3); // easeOutCubic
+    const val = target * eased;
+
+    if (p >= 1) {
+      el.textContent = formatPercent(target);
+    } else {
+      if (target === 0) {
+        el.textContent = '0%';
+      } else {
+        el.textContent = val.toFixed(1).replace('.', ',') + '%';
+      }
+      requestAnimationFrame(tick);
+    }
+  }
+  requestAnimationFrame(tick);
+}
+
+/* ================= ПУНКТ 11: КАРТИНКА-РЕЗУЛЬТАТ ================= */
+let lastResult = null;
+
+function capitalize(s) {
+  if (!s) return s;
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+function generateShareImage(a, b, percent, verdict) {
+  const W = 900, H = 900;
+  const canvas = document.createElement('canvas');
+  canvas.width = W;
+  canvas.height = H;
+  const ctx = canvas.getContext('2d');
+
+  // фон
+  const bg = ctx.createLinearGradient(0, 0, W, H);
+  bg.addColorStop(0, '#ffe4ee');
+  bg.addColorStop(1, '#ffc9de');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, W, H);
+
+  // декоративные сердечки
+  const heartGlyphs = ['💗', '💖', '💕', '❤️'];
+  for (let i = 0; i < 14; i++) {
+    ctx.save();
+    ctx.globalAlpha = 0.12 + Math.random() * 0.18;
+    ctx.font = (30 + Math.random() * 60) + 'px "Segoe UI Emoji", "Apple Color Emoji", sans-serif';
+    ctx.fillText(heartGlyphs[i % heartGlyphs.length],
+      Math.random() * W * 0.9, Math.random() * H * 0.95);
+    ctx.restore();
+  }
+
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+
+  // заголовок
+  ctx.fillStyle = '#d6337c';
+  ctx.font = 'bold 38px "Segoe UI", sans-serif';
+  ctx.fillText('Калькулятор совместимости', W / 2, 100);
+
+  // имена (с автоматической подгонкой шрифта)
+  ctx.fillStyle = '#7a3a56';
+  let nameSize = 62;
+  ctx.font = 'bold ' + nameSize + 'px "Segoe UI", sans-serif';
+  const namesLine = capitalize(a) + '  +  ' + capitalize(b);
+  while (ctx.measureText(namesLine).width > W - 100 && nameSize > 26) {
+    nameSize -= 2;
+    ctx.font = 'bold ' + nameSize + 'px "Segoe UI", sans-serif';
+  }
+  ctx.fillText(namesLine, W / 2, 240);
+
+  // процент
+  const cols = colorsForValue(percent);
+  const pg = ctx.createLinearGradient(W / 2 - 220, 0, W / 2 + 220, 0);
+  pg.addColorStop(0, cols.from);
+  pg.addColorStop(1, cols.to);
+  ctx.fillStyle = pg;
+  ctx.font = 'bold 200px "Segoe UI", sans-serif';
+  ctx.fillText(formatPercent(percent), W / 2, 470);
+
+  // вердикт (с переносом строк)
+  ctx.fillStyle = '#c9538a';
+  ctx.font = '32px "Segoe UI", sans-serif';
+  const words = verdict.split(' ');
+  const lines = [];
+  let line = '';
+  for (const w of words) {
+    if ((line + ' ' + w).trim().length > 28 && line) {
+      lines.push(line);
+      line = w;
+    } else {
+      line = line ? line + ' ' + w : w;
+    }
+  }
+  if (line) lines.push(line);
+  const startY = 620 - (lines.length - 1) * 21;
+  lines.forEach((l, i) => ctx.fillText(l, W / 2, startY + i * 42));
+
+  // большое сердце
+  ctx.font = '100px "Segoe UI Emoji", "Apple Color Emoji", sans-serif';
+  ctx.fillText('💗', W / 2, 810);
+
+  return canvas;
+}
+
+async function shareResult() {
+  if (!lastResult) return;
+  const canvas = generateShareImage(
+    lastResult.a, lastResult.b, lastResult.percent, lastResult.verdict
+  );
+
+  canvas.toBlob(async (blob) => {
+    if (!blob) return;
+    const file = new File([blob], 'compatibility.png', { type: 'image/png' });
+
+    // мобильный share (если поддерживается)
+    if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+      try {
+        await navigator.share({ files: [file], title: 'Калькулятор совместимости' });
+        return;
+      } catch (e) { /* отмена — переходим к скачиванию */ }
+    }
+
+    // fallback — скачать PNG
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'compatibility.png';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }, 'image/png');
 }
 
 /* ================= ОСНОВНАЯ ФУНКЦИЯ ================= */
 const resultBox = document.getElementById('result');
 const timerBox  = document.getElementById('timer');
+const card      = document.getElementById('card');
 
 function calculate() {
-  const n1 = norm(document.getElementById('name1').value);
-  const n2 = norm(document.getElementById('name2').value);
+  const rawA = document.getElementById('name1').value.trim();
+  const rawB = document.getElementById('name2').value.trim();
+  const n1 = norm(rawA);
+  const n2 = norm(rawB);
 
   if (!n1 || !n2) {
     resultBox.innerHTML = '<p class="verdict">Введите оба имени, пожалуйста 🙏</p>';
@@ -369,20 +715,35 @@ function calculate() {
     return;
   }
 
-  const value = getCompatibility(n1, n2);
+  const value   = getCompatibility(n1, n2);
+  const verdict = verdictFor(value);
+  const cols    = colorsForValue(value);
+  lastResult = { a: rawA || n1, b: rawB || n2, percent: value, verdict };
 
   resultBox.innerHTML = `
     <div class="percent-label">Совместимость</div>
-    <div class="percent">${formatPercent(value)}</div>
-    <div class="bar"><div class="bar-fill" id="barFill"></div></div>
-    <p class="verdict">${verdictFor(value)}</p>
+    <div class="percent" id="percentEl" style="background: linear-gradient(135deg, ${cols.from}, ${cols.to}); -webkit-background-clip: text; background-clip: text;">0%</div>
+    <div class="bar"><div class="bar-fill" id="barFill" style="background: linear-gradient(90deg, ${cols.from}, ${cols.to});"></div></div>
+    <p class="verdict">${verdict}</p>
+    <button class="share-btn" id="shareBtn">📸 Поделиться результатом</button>
   `;
 
+  // 1. Взрыв сердечек
+  heartBurst(card);
+
+  // 3. Анимация накрутки процента
+  animatePercent(document.getElementById('percentEl'), value);
+
+  // Полоска растёт параллельно
   requestAnimationFrame(() => {
     const fill = document.getElementById('barFill');
     if (fill) setTimeout(() => { fill.style.width = value + '%'; }, 50);
   });
 
+  // 11. Кнопка «Поделиться»
+  document.getElementById('shareBtn').onclick = shareResult;
+
+  // Таймеры — только для пары Катя + Матвей
   const isKatyaMatvey =
     (n1 === 'катя' && n2 === 'матвей') ||
     (n1 === 'матвей' && n2 === 'катя');
