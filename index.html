@@ -25,6 +25,8 @@
     --timer-num: #e0417f;
     --dashed: #ffd0e0;
     --shadow: 0 20px 50px rgba(255, 120, 170, .35), 0 4px 12px rgba(255, 120, 170, .15);
+    --compliment-bg-1: rgba(255, 214, 231, 0.7);
+    --compliment-bg-2: rgba(255, 200, 222, 0.7);
   }
   [data-theme="dark"] {
     --bg-1: #2a0f1d;
@@ -46,6 +48,8 @@
     --timer-num: #ff8fc0;
     --dashed: rgba(255, 158, 196, 0.3);
     --shadow: 0 20px 50px rgba(0, 0, 0, .5), 0 4px 12px rgba(0, 0, 0, .3);
+    --compliment-bg-1: rgba(100, 35, 65, 0.5);
+    --compliment-bg-2: rgba(120, 40, 75, 0.5);
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -175,6 +179,24 @@
 
   #result { margin-top: 24px; overflow: hidden; }
 
+  .label-badge {
+    display: inline-block;
+    padding: 6px 18px;
+    background: linear-gradient(135deg, #ff9ec4, #ff6fa8);
+    color: #fff;
+    border-radius: 20px;
+    font-size: .82rem;
+    font-weight: 600;
+    letter-spacing: .4px;
+    margin-bottom: 14px;
+    box-shadow: 0 4px 12px rgba(255, 111, 168, .35);
+    animation: badgeIn .5s ease;
+  }
+  @keyframes badgeIn {
+    from { opacity: 0; transform: scale(.8); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+
   .percent {
     font-size: 3.4rem;
     font-weight: 800;
@@ -212,6 +234,44 @@
     font-size: .95rem;
     margin-top: 8px;
     transition: color .5s;
+  }
+
+  /* Комплимент для пары Катя + Матвей */
+  .compliment-box {
+    margin: 20px 0 4px;
+    padding: 20px 22px 18px;
+    background: linear-gradient(135deg, var(--compliment-bg-1), var(--compliment-bg-2));
+    border: 1.5px solid rgba(255, 158, 196, 0.6);
+    border-radius: 18px;
+    color: var(--accent);
+    font-size: .98rem;
+    font-style: italic;
+    line-height: 1.55;
+    position: relative;
+    text-align: center;
+    animation: fadeIn .7s ease;
+    box-shadow: 0 4px 14px rgba(255, 150, 190, .2);
+  }
+  .compliment-box .tag {
+    display: block;
+    font-style: normal;
+    font-weight: 700;
+    font-size: .78rem;
+    letter-spacing: .6px;
+    text-transform: uppercase;
+    color: var(--text-sub);
+    margin-bottom: 8px;
+  }
+  .compliment-box .heart-top {
+    position: absolute;
+    top: -16px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 1.6rem;
+    background: var(--card-bg);
+    padding: 2px 10px;
+    border-radius: 50%;
+    line-height: 1;
   }
 
   .share-btn {
@@ -316,6 +376,7 @@
     .timer-cell .num { font-size: 1.15rem; }
     h1 { font-size: 1.4rem; }
     #themeToggle { top: 12px; right: 12px; width: 42px; height: 42px; font-size: 1.1rem; }
+    .compliment-box { font-size: .9rem; padding: 18px 16px 14px; }
   }
 </style>
 </head>
@@ -410,20 +471,67 @@ document.getElementById('themeToggle').addEventListener('click', () => {
 })();
 
 /* ================= ДАННЫЕ ================= */
+
+// Комплимент для пары Катя + Матвей
+const KATYA_COMPLIMENT = 'Катя — это человек-солнце: рядом с ней становится теплее, светлее и как-то сразу верится, что всё обязательно будет хорошо. Такие люди, как она, — редкость ☀️💗';
+
+// Пары: [['имя1','имя2'], значение, метка?]
 const PAIRS = [
   [['катя', 'матвей'],    99.7],
   [['катя', 'аня'],       69],
   [['дима', 'дима'],      67],
   [['артем', 'тимофей'],  0.5],
-  [['дима', 'аня'],       50]
+  [['дима', 'аня'],       50],
+  [['аня', 'тимофей'],    75, 'семья'],
+  [['маша', 'артем'],     89],
+  [['тимофей', 'катя'],   35, 'страшненькая подруга и изгой города'],
+  [['кристина', 'саша'],  99],
+  [['лера', 'саша'],      75],
+  [['лера', 'влад'],      93],
+  [['милана', 'леша'],    80],
+  [['настя', 'замир'],    90],
+  [['настя', 'игорь'],    75],
+  [['вера', 'леша'],      79],
+  [['буля', 'хуня'],      1000],
+  [['тимофей2', 'егор'],  1000]
 ];
 
+// Синонимы: любые варианты → каноническая форма (ключи без "ё")
 const ALIASES = {
+  // Катя
   'екатерина': 'катя', 'катерина': 'катя', 'катюша': 'катя', 'катюха': 'катя', 'кет': 'катя',
-  'дмитрий':   'дима', 'димон':    'дима', 'димыч':  'дима', 'димуля': 'дима',
-  'тема':      'артем','темка':    'артем','темочка':'артем','артемий':'артем',
-  'анюта':     'аня',  'анюша':    'аня',  'анна':   'аня',
-  'матя':      'матвей','матюша':  'матвей'
+  // Матвей
+  'матя': 'матвей', 'матюша': 'матвей',
+  // Дима
+  'дмитрий': 'дима', 'димон': 'дима', 'димыч': 'дима', 'димуля': 'дима',
+  // Артём
+  'тема': 'артем', 'темка': 'артем', 'темочка': 'артем', 'артемий': 'артем',
+  // Аня
+  'анюта': 'аня', 'анюша': 'аня', 'анна': 'аня', 'аннушка': 'аня',
+  // Тимофей
+  'тима': 'тимофей', 'тимоша': 'тимофей', 'тимоха': 'тимофей',
+  // Маша
+  'мария': 'маша', 'маруся': 'маша', 'машенька': 'маша',
+  // Кристина
+  'крис': 'кристина', 'кристи': 'кристина', 'кристюша': 'кристина',
+  // Саша
+  'александр': 'саша', 'шура': 'саша', 'сашка': 'саша', 'сашок': 'саша', 'санек': 'саша',
+  // Лера
+  'валерия': 'лера', 'лерочка': 'лера', 'леруся': 'лера',
+  // Влад
+  'владислав': 'влад', 'влада': 'влад', 'владос': 'влад', 'владик': 'влад',
+  // Милана
+  'мила': 'милана', 'милена': 'милана', 'милашка': 'милана',
+  // Лёша
+  'алексей': 'леша', 'леха': 'леша', 'лешка': 'леша', 'алеша': 'леша', 'лешенька': 'леша',
+  // Настя
+  'анастасия': 'настя', 'настюша': 'настя', 'настена': 'настя', 'настенька': 'настя',
+  // Вера
+  'верочка': 'вера', 'веруня': 'вера',
+  // Игорь
+  'игорек': 'игорь', 'игореша': 'игорь',
+  // Егор
+  'егорка': 'егор', 'егорушка': 'егор'
 };
 
 /* ================= ЛОГИКА ================= */
@@ -432,11 +540,14 @@ function norm(s) {
   return ALIASES[v] || v;
 }
 
+// Возвращает { value, label }
 function getCompatibility(a, b) {
-  for (const [[x, y], value] of PAIRS) {
-    if ((a === x && b === y) || (a === y && b === x)) return value;
+  for (const [[x, y], value, label] of PAIRS) {
+    if ((a === x && b === y) || (a === y && b === x)) {
+      return { value, label: label || null };
+    }
   }
-  return 0;
+  return { value: 0, label: null };
 }
 
 function formatPercent(v) {
@@ -444,34 +555,34 @@ function formatPercent(v) {
   return s + '%';
 }
 
-// Пункт 2: расширенный список вердиктов
 function verdictFor(v) {
-  if (v === 0)  return 'Увы, искры пока не видно… но всё впереди!';
-  if (v < 1)    return 'Почти ничего, но вдруг это знак?';
-  if (v < 10)   return 'Совсем чуть-чуть. Зато есть куда расти.';
-  if (v < 25)   return 'Есть шанс, если сильно постараться.';
-  if (v < 50)   return 'Маленькая искра уже теплится.';
-  if (v < 60)   return 'Половина успеха — уже неплохо!';
-  if (v < 70)   return 'Неплохо! Что-то определённо есть.';
-  if (v < 80)   return 'Хорошая пара — вам точно не скучно.';
-  if (v < 90)   return 'Отличная пара! 💕';
-  if (v < 95)   return 'Очень сильная связь! 💖';
-  if (v < 99)   return 'Почти идеал — берегите друг друга!';
+  if (v >= 1000) return 'МАКСИМАЛЬНАЯ СОВМЕСТИМОСТЬ! Это буквально судьба 🔥💫';
+  if (v === 0)   return 'Увы, искры пока не видно… но всё впереди!';
+  if (v < 1)     return 'Почти ничего, но вдруг это знак?';
+  if (v < 10)    return 'Совсем чуть-чуть. Зато есть куда расти.';
+  if (v < 25)    return 'Есть шанс, если сильно постараться.';
+  if (v < 50)    return 'Маленькая искра уже теплится.';
+  if (v < 60)    return 'Половина успеха — уже неплохо!';
+  if (v < 70)    return 'Неплохо! Что-то определённо есть.';
+  if (v < 80)    return 'Хорошая пара — вам точно не скучно.';
+  if (v < 90)    return 'Отличная пара! 💕';
+  if (v < 95)    return 'Очень сильная связь! 💖';
+  if (v < 100)   return 'Почти идеал — берегите друг друга!';
   return 'Идеальная совместимость! 💞';
 }
 
-// Пункт 4: цвет в зависимости от значения
 function colorsForValue(v) {
-  if (v === 0)  return { from: '#b9a7b3', to: '#9b8794' };
-  if (v < 25)   return { from: '#d4a5b8', to: '#b58ba0' };
-  if (v < 50)   return { from: '#ffa8cb', to: '#ff7eb0' };
-  if (v < 80)   return { from: '#ff5c9d', to: '#e0417f' };
-  if (v < 95)   return { from: '#ff3d8a', to: '#c72a6e' };
-  return { from: '#ffb347', to: '#ff5c9d' }; // золотой градиент
+  if (v >= 1000) return { from: '#ffd700', to: '#ff5c9d' }; // золото
+  if (v === 0)   return { from: '#b9a7b3', to: '#9b8794' };
+  if (v < 25)    return { from: '#d4a5b8', to: '#b58ba0' };
+  if (v < 50)    return { from: '#ffa8cb', to: '#ff7eb0' };
+  if (v < 80)    return { from: '#ff5c9d', to: '#e0417f' };
+  if (v < 95)    return { from: '#ff3d8a', to: '#c72a6e' };
+  return { from: '#ffb347', to: '#ff5c9d' };
 }
 
 /* ================= ТАЙМЕРЫ ================= */
-const START_DATE    = new Date(2026, 7, 30, 21, 0, 0); // 30.08.2026 21:00
+const START_DATE    = new Date(2026, 7, 30, 21, 0, 0);
 const KATYA_BIRTH   = { year: 2008, month: 11, day: 21 };
 const MATVEY_BIRTH  = { year: 2008, month: 11, day: 14 };
 
@@ -519,8 +630,8 @@ function updateAllTimers() {
   renderTimer('k', nextBirthday(KATYA_BIRTH.month, KATYA_BIRTH.day).getTime() - now);
   renderTimer('m', nextBirthday(MATVEY_BIRTH.month, MATVEY_BIRTH.day).getTime() - now);
 
-  document.getElementById('katya-age').textContent   = 'исполнится ' + (calcAge(KATYA_BIRTH) + 1);
-  document.getElementById('matvey-age').textContent  = 'исполнится ' + (calcAge(MATVEY_BIRTH) + 1);
+  document.getElementById('katya-age').textContent  = 'исполнится ' + (calcAge(KATYA_BIRTH) + 1);
+  document.getElementById('matvey-age').textContent = 'исполнится ' + (calcAge(MATVEY_BIRTH) + 1);
 }
 
 let timerInterval = null;
@@ -530,7 +641,7 @@ function startTimer() {
   timerInterval = setInterval(updateAllTimers, 1000);
 }
 
-/* ================= ПУНКТ 1: ВЗРЫВ СЕРДЕЧЕК ================= */
+/* ================= ВЗРЫВ СЕРДЕЧЕК ================= */
 function heartBurst(container) {
   const rect = container.getBoundingClientRect();
   const cx = rect.width / 2;
@@ -557,14 +668,15 @@ function heartBurst(container) {
   }
 }
 
-/* ================= ПУНКТ 3: АНИМАЦИЯ НАКРУТКИ ЧИСЛА ================= */
+/* ================= АНИМАЦИЯ НАКРУТКИ ЧИСЛА ================= */
 function animatePercent(el, target) {
   const duration = 1500;
   const start = performance.now();
+  const isInt = Number.isInteger(target);
 
   function tick(now) {
     const p = Math.min((now - start) / duration, 1);
-    const eased = 1 - Math.pow(1 - p, 3); // easeOutCubic
+    const eased = 1 - Math.pow(1 - p, 3);
     const val = target * eased;
 
     if (p >= 1) {
@@ -572,6 +684,8 @@ function animatePercent(el, target) {
     } else {
       if (target === 0) {
         el.textContent = '0%';
+      } else if (isInt) {
+        el.textContent = Math.round(val) + '%';
       } else {
         el.textContent = val.toFixed(1).replace('.', ',') + '%';
       }
@@ -581,7 +695,7 @@ function animatePercent(el, target) {
   requestAnimationFrame(tick);
 }
 
-/* ================= ПУНКТ 11: КАРТИНКА-РЕЗУЛЬТАТ ================= */
+/* ================= КАРТИНКА-РЕЗУЛЬТАТ ================= */
 let lastResult = null;
 
 function capitalize(s) {
@@ -589,21 +703,19 @@ function capitalize(s) {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
-function generateShareImage(a, b, percent, verdict) {
+function generateShareImage(a, b, percent, verdict, label) {
   const W = 900, H = 900;
   const canvas = document.createElement('canvas');
   canvas.width = W;
   canvas.height = H;
   const ctx = canvas.getContext('2d');
 
-  // фон
   const bg = ctx.createLinearGradient(0, 0, W, H);
   bg.addColorStop(0, '#ffe4ee');
   bg.addColorStop(1, '#ffc9de');
   ctx.fillStyle = bg;
   ctx.fillRect(0, 0, W, H);
 
-  // декоративные сердечки
   const heartGlyphs = ['💗', '💖', '💕', '❤️'];
   for (let i = 0; i < 14; i++) {
     ctx.save();
@@ -617,12 +729,37 @@ function generateShareImage(a, b, percent, verdict) {
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
 
-  // заголовок
   ctx.fillStyle = '#d6337c';
   ctx.font = 'bold 38px "Segoe UI", sans-serif';
   ctx.fillText('Калькулятор совместимости', W / 2, 100);
 
-  // имена (с автоматической подгонкой шрифта)
+  // Метка над именами (если есть)
+  let namesY = 240;
+  if (label) {
+    ctx.font = 'bold 22px "Segoe UI", sans-serif';
+    const lw = ctx.measureText(label).width + 50;
+    const lg = ctx.createLinearGradient(W / 2 - lw / 2, 0, W / 2 + lw / 2, 0);
+    lg.addColorStop(0, '#ff9ec4');
+    lg.addColorStop(1, '#ff6fa8');
+    ctx.fillStyle = lg;
+    const rx = W / 2 - lw / 2, ry = 165, rh = 44, rr = 22;
+    ctx.beginPath();
+    ctx.moveTo(rx + rr, ry);
+    ctx.lineTo(rx + lw - rr, ry);
+    ctx.quadraticCurveTo(rx + lw, ry, rx + lw, ry + rr);
+    ctx.lineTo(rx + lw, ry + rh - rr);
+    ctx.quadraticCurveTo(rx + lw, ry + rh, rx + lw - rr, ry + rh);
+    ctx.lineTo(rx + rr, ry + rh);
+    ctx.quadraticCurveTo(rx, ry + rh, rx, ry + rh - rr);
+    ctx.lineTo(rx, ry + rr);
+    ctx.quadraticCurveTo(rx, ry, rx + rr, ry);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.fillText(label, W / 2, ry + rh / 2 + 2);
+    namesY = 265;
+  }
+
   ctx.fillStyle = '#7a3a56';
   let nameSize = 62;
   ctx.font = 'bold ' + nameSize + 'px "Segoe UI", sans-serif';
@@ -631,18 +768,16 @@ function generateShareImage(a, b, percent, verdict) {
     nameSize -= 2;
     ctx.font = 'bold ' + nameSize + 'px "Segoe UI", sans-serif';
   }
-  ctx.fillText(namesLine, W / 2, 240);
+  ctx.fillText(namesLine, W / 2, namesY);
 
-  // процент
   const cols = colorsForValue(percent);
   const pg = ctx.createLinearGradient(W / 2 - 220, 0, W / 2 + 220, 0);
   pg.addColorStop(0, cols.from);
   pg.addColorStop(1, cols.to);
   ctx.fillStyle = pg;
   ctx.font = 'bold 200px "Segoe UI", sans-serif';
-  ctx.fillText(formatPercent(percent), W / 2, 470);
+  ctx.fillText(formatPercent(percent), W / 2, 480);
 
-  // вердикт (с переносом строк)
   ctx.fillStyle = '#c9538a';
   ctx.font = '32px "Segoe UI", sans-serif';
   const words = verdict.split(' ');
@@ -660,7 +795,6 @@ function generateShareImage(a, b, percent, verdict) {
   const startY = 620 - (lines.length - 1) * 21;
   lines.forEach((l, i) => ctx.fillText(l, W / 2, startY + i * 42));
 
-  // большое сердце
   ctx.font = '100px "Segoe UI Emoji", "Apple Color Emoji", sans-serif';
   ctx.fillText('💗', W / 2, 810);
 
@@ -670,22 +804,20 @@ function generateShareImage(a, b, percent, verdict) {
 async function shareResult() {
   if (!lastResult) return;
   const canvas = generateShareImage(
-    lastResult.a, lastResult.b, lastResult.percent, lastResult.verdict
+    lastResult.a, lastResult.b, lastResult.percent, lastResult.verdict, lastResult.label
   );
 
   canvas.toBlob(async (blob) => {
     if (!blob) return;
     const file = new File([blob], 'compatibility.png', { type: 'image/png' });
 
-    // мобильный share (если поддерживается)
     if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
       try {
         await navigator.share({ files: [file], title: 'Калькулятор совместимости' });
         return;
-      } catch (e) { /* отмена — переходим к скачиванию */ }
+      } catch (e) { /* отмена */ }
     }
 
-    // fallback — скачать PNG
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -715,38 +847,43 @@ function calculate() {
     return;
   }
 
-  const value   = getCompatibility(n1, n2);
+  const { value, label } = getCompatibility(n1, n2);
   const verdict = verdictFor(value);
   const cols    = colorsForValue(value);
-  lastResult = { a: rawA || n1, b: rawB || n2, percent: value, verdict };
+  lastResult = { a: rawA || n1, b: rawB || n2, percent: value, verdict, label };
+
+  const isKatyaMatvey =
+    (n1 === 'катя' && n2 === 'матвей') ||
+    (n1 === 'матвей' && n2 === 'катя');
+
+  // Ширина полоски — не больше 100%, даже если значение 1000%
+  const barWidth = Math.min(value, 100);
 
   resultBox.innerHTML = `
+    ${label ? `<div class="label-badge">${label}</div>` : ''}
     <div class="percent-label">Совместимость</div>
     <div class="percent" id="percentEl" style="background: linear-gradient(135deg, ${cols.from}, ${cols.to}); -webkit-background-clip: text; background-clip: text;">0%</div>
     <div class="bar"><div class="bar-fill" id="barFill" style="background: linear-gradient(90deg, ${cols.from}, ${cols.to});"></div></div>
     <p class="verdict">${verdict}</p>
+    ${isKatyaMatvey ? `
+      <div class="compliment-box">
+        <span class="heart-top">💌</span>
+        <span class="tag">Специально для Кати</span>
+        ${KATYA_COMPLIMENT}
+      </div>
+    ` : ''}
     <button class="share-btn" id="shareBtn">📸 Поделиться результатом</button>
   `;
 
-  // 1. Взрыв сердечек
   heartBurst(card);
-
-  // 3. Анимация накрутки процента
   animatePercent(document.getElementById('percentEl'), value);
 
-  // Полоска растёт параллельно
   requestAnimationFrame(() => {
     const fill = document.getElementById('barFill');
-    if (fill) setTimeout(() => { fill.style.width = value + '%'; }, 50);
+    if (fill) setTimeout(() => { fill.style.width = barWidth + '%'; }, 50);
   });
 
-  // 11. Кнопка «Поделиться»
   document.getElementById('shareBtn').onclick = shareResult;
-
-  // Таймеры — только для пары Катя + Матвей
-  const isKatyaMatvey =
-    (n1 === 'катя' && n2 === 'матвей') ||
-    (n1 === 'матвей' && n2 === 'катя');
 
   if (isKatyaMatvey) {
     timerBox.classList.add('show');
