@@ -2,7 +2,8 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#ffd6e7">
 <title>Калькулятор совместимости</title>
 <style>
   :root {
@@ -40,43 +41,87 @@
     --hate-border: rgba(255, 60, 90, 0.3);
   }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  html { -webkit-text-size-adjust: 100%; }
 
   body {
     min-height: 100vh;
+    min-height: 100dvh;
     font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
     background: linear-gradient(160deg, var(--bg-1) 0%, var(--bg-2) 40%, var(--bg-3) 100%);
     display: flex; align-items: center; justify-content: center;
-    padding: 20px; overflow-x: hidden; position: relative;
+    padding: 20px;
+    padding: max(20px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right)) max(20px, env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left));
+    overflow-x: hidden;
+    position: relative;
     transition: background .5s;
   }
 
   #themeToggle {
-    position: fixed; top: 20px; right: 20px;
+    position: fixed;
+    top: max(20px, env(safe-area-inset-top)); right: max(20px, env(safe-area-inset-right));
     width: 48px; height: 48px; border-radius: 50%;
     border: 2px solid var(--card-border);
     background: var(--card-bg);
     backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
     font-size: 1.3rem; cursor: pointer; z-index: 100;
-    transition: .3s;
+    transition: transform .3s;
     display: flex; align-items: center; justify-content: center;
     box-shadow: 0 4px 12px rgba(255, 120, 170, .25);
+    touch-action: manipulation;
   }
   #themeToggle:hover { transform: scale(1.1) rotate(15deg); }
+  #themeToggle:active { transform: scale(.95); }
 
   #hearts { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; }
+
   .heart {
-    position: absolute; bottom: -60px;
+    position: absolute;
+    bottom: -60px;
     color: var(--heart-bg);
-    animation-name: floatUp; animation-timing-function: linear;
-    animation-iteration-count: infinite; opacity: 0;
-    user-select: none; transition: color .5s;
+    animation-name: floatUp;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    opacity: 0;
+    user-select: none;
+    pointer-events: auto;
+    cursor: pointer;
+    transition: color .5s;
+    transform-origin: center;
+    will-change: transform, opacity;
   }
   @keyframes floatUp {
     0%   { transform: translateY(0) rotate(0deg) scale(0.8); opacity: 0; }
     10%  { opacity: .9; }
     90%  { opacity: .5; }
     100% { transform: translateY(-115vh) rotate(40deg) scale(1.2); opacity: 0; }
+  }
+
+  /* Лопание сердечка */
+  .heart.popping {
+    animation: popHeart .45s cubic-bezier(.2, .8, .4, 1) forwards !important;
+    pointer-events: none;
+  }
+  @keyframes popHeart {
+    0%   { transform: scale(1) rotate(0deg); opacity: 1; }
+    45%  { transform: scale(1.7) rotate(8deg); opacity: 1; }
+    100% { transform: scale(.15) rotate(-15deg); opacity: 0; }
+  }
+
+  /* Мини-брызги при лопании */
+  .mini-burst {
+    position: fixed;
+    pointer-events: none;
+    font-size: 14px;
+    z-index: 200;
+    transform: translate(-50%, -50%);
+    animation: miniBurst .6s ease-out forwards;
+    will-change: transform, opacity;
+  }
+  @keyframes miniBurst {
+    0%   { transform: translate(-50%, -50%) scale(.4); opacity: 1; }
+    100% { transform: translate(calc(-50% + var(--mx)), calc(-50% + var(--my))) scale(.2); opacity: 0; }
   }
 
   .container {
@@ -95,26 +140,36 @@
   .subtitle { color: var(--text-sub); font-size: .9rem; margin-bottom: 24px; transition: color .5s; }
 
   input {
-    width: 100%; padding: 14px 18px; border-radius: 14px;
+    width: 100%;
+    padding: 14px 18px;
+    border-radius: 14px;
     border: 2px solid var(--input-border);
     background: var(--input-bg);
-    font-size: 1rem; color: var(--text-main);
-    outline: none; transition: .25s;
-    margin-bottom: 12px; text-align: center;
+    font-size: 16px;
+    font-family: inherit;
+    color: var(--text-main);
+    outline: none;
+    transition: border-color .25s, box-shadow .25s;
+    margin-bottom: 12px;
+    text-align: center;
   }
   input::placeholder { color: var(--text-sub); opacity: .6; }
   input:focus { border-color: var(--input-focus); box-shadow: 0 0 0 4px rgba(255, 158, 196, .25); }
 
   button.main-btn {
-    width: 100%; padding: 15px; margin-top: 6px;
+    width: 100%;
+    padding: 15px;
+    margin-top: 6px;
     border: none; border-radius: 14px;
     background: linear-gradient(135deg, #ff9ec4, #ff6fa8);
-    color: #fff; font-size: 1.05rem; font-weight: 600;
-    cursor: pointer; transition: .25s;
+    color: #fff; font-size: 1.05rem; font-weight: 600; font-family: inherit;
+    cursor: pointer;
+    transition: transform .2s, box-shadow .2s;
     box-shadow: 0 8px 20px rgba(255, 111, 168, .45);
+    touch-action: manipulation;
   }
   button.main-btn:hover  { transform: translateY(-2px); box-shadow: 0 12px 26px rgba(255, 111, 168, .55); }
-  button.main-btn:active { transform: translateY(0); }
+  button.main-btn:active { transform: translateY(0) scale(.98); }
 
   #result { margin-top: 24px; overflow: hidden; }
 
@@ -157,7 +212,6 @@
   }
   .verdict { color: var(--text-sub); font-size: .95rem; margin-top: 8px; transition: color .5s; }
 
-  /* Блок ненависти */
   .hate-block {
     background: linear-gradient(160deg, var(--hate-bg), rgba(120, 0, 30, 0.08));
     border: 1.5px solid var(--hate-border);
@@ -172,13 +226,9 @@
     to   { opacity: 1; transform: scale(1); }
   }
   .hate-title {
-    font-size: .85rem;
-    font-weight: 700;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    color: #b91c3c;
-    margin-bottom: 14px;
-    transition: color .5s;
+    font-size: .85rem; font-weight: 700; letter-spacing: 1.5px;
+    text-transform: uppercase; color: #b91c3c;
+    margin-bottom: 14px; transition: color .5s;
   }
   [data-theme="dark"] .hate-title { color: #ff5b7f; }
 
@@ -209,10 +259,12 @@
     margin-top: 16px; padding: 11px 20px;
     border: 2px solid var(--input-border);
     background: transparent; color: var(--accent);
-    border-radius: 12px; font-size: .92rem; font-weight: 600;
-    cursor: pointer; transition: .25s;
+    border-radius: 12px; font-size: .92rem; font-weight: 600; font-family: inherit;
+    cursor: pointer; transition: background .25s, color .25s, border-color .25s;
+    touch-action: manipulation;
   }
   .share-btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .share-btn:active { transform: scale(.97); }
 
   #timer {
     margin-top: 26px; padding-top: 22px;
@@ -250,17 +302,72 @@
     will-change: transform, opacity;
   }
   @keyframes burst {
-    0% { transform: translate(-50%, -50%) scale(.3) rotate(0deg); opacity: 1; }
+    0%   { transform: translate(-50%, -50%) scale(.3) rotate(0deg); opacity: 1; }
     100% { transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(1.1) rotate(var(--rot)); opacity: 0; }
   }
 
-  @media (max-width: 420px) {
+  /* ====== МОБИЛЬНАЯ ОПТИМИЗАЦИЯ ====== */
+  @media (max-width: 480px) {
+    body { padding: 12px; }
+
+    .container {
+      padding: 26px 18px 22px;
+      border-radius: 22px;
+    }
+    h1 { font-size: 1.35rem; }
+    .subtitle { font-size: .82rem; margin-bottom: 18px; }
+
+    input {
+      padding: 14px 14px;
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+    button.main-btn {
+      padding: 15px;
+      font-size: 1rem;
+    }
+
     .percent { font-size: 2.6rem; }
-    .timer-cell .num { font-size: 1.15rem; }
-    h1 { font-size: 1.4rem; }
-    #themeToggle { top: 12px; right: 12px; width: 42px; height: 42px; font-size: 1.1rem; }
-    .compliment-box { font-size: .9rem; padding: 18px 16px 14px; }
-    .hate-block { padding: 18px 14px 14px; }
+    .percent-label { font-size: .88rem; }
+    .verdict { font-size: .88rem; }
+
+    .timer-grid { gap: 6px; }
+    .timer-cell { padding: 10px 2px 8px; border-radius: 12px; }
+    .timer-cell .num { font-size: 1.05rem; }
+    .timer-cell .unit { font-size: .62rem; margin-top: 3px; }
+    #timer h2 { font-size: 1rem; }
+    #timer .since { font-size: .74rem; margin-bottom: 10px; }
+
+    .compliment-box { font-size: .88rem; padding: 16px 14px 12px; }
+    .compliment-box .heart-top { font-size: 1.3rem; }
+    .compliment-box .tag { font-size: .72rem; }
+
+    .hate-block { padding: 18px 14px 14px; border-radius: 16px; }
+    .hate-title { font-size: .78rem; letter-spacing: 1px; }
+
+    .label-badge { font-size: .75rem; padding: 5px 14px; margin-bottom: 10px; }
+    .share-btn { font-size: .85rem; padding: 11px 16px; margin-top: 14px; }
+    #themeToggle {
+      width: 44px; height: 44px; font-size: 1.15rem;
+      top: max(12px, env(safe-area-inset-top));
+      right: max(12px, env(safe-area-inset-right));
+    }
+  }
+
+  @media (max-width: 360px) {
+    .timer-grid { gap: 4px; }
+    .timer-cell { padding: 8px 1px 6px; border-radius: 10px; }
+    .timer-cell .num { font-size: .92rem; }
+    .timer-cell .unit { font-size: .55rem; letter-spacing: .2px; }
+    .percent { font-size: 2.2rem; }
+    h1 { font-size: 1.2rem; }
+    .container { padding: 22px 14px 20px; }
+  }
+
+  /* Отключаем анимации для тех, кто просит */
+  @media (prefers-reduced-motion: reduce) {
+    .heart, .burst-heart, .mini-burst { animation-duration: .01s !important; }
+    * { transition-duration: .01s !important; }
   }
 </style>
 </head>
@@ -273,8 +380,8 @@
     <h1>Калькулятор совместимости</h1>
     <p class="subtitle">Введите два имени и узнайте свою судьбу 💗</p>
 
-    <input id="name1" type="text" placeholder="Первое имя" autocomplete="off">
-    <input id="name2" type="text" placeholder="Второе имя" autocomplete="off">
+    <input id="name1" type="text" placeholder="Первое имя" autocomplete="off" autocapitalize="words">
+    <input id="name2" type="text" placeholder="Второе имя" autocomplete="off" autocapitalize="words">
     <button id="calcBtn" class="main-btn">Рассчитать совместимость</button>
 
     <div id="result"></div>
@@ -314,6 +421,10 @@
   </div>
 
 <script>
+/* ================= РАЗМЕРЫ ПОД УСТРОЙСТВО ================= */
+const IS_MOBILE = window.matchMedia('(max-width: 600px)').matches;
+const HEART_COUNT = IS_MOBILE ? 12 : 22;
+
 /* ================= ТЕМА ================= */
 (function initTheme() {
   const saved = localStorage.getItem('theme');
@@ -335,28 +446,83 @@ document.getElementById('themeToggle').addEventListener('click', () => {
   }
 });
 
-/* ================= ФОН ================= */
-(function makeHearts() {
-  const wrap = document.getElementById('hearts');
-  const glyphs = ['♥', '💗', '💖', '💕', '❤'];
-  for (let i = 0; i < 22; i++) {
-    const h = document.createElement('span');
-    h.className = 'heart';
-    h.textContent = glyphs[Math.floor(Math.random() * glyphs.length)];
-    h.style.left = Math.random() * 100 + 'vw';
-    h.style.fontSize = (14 + Math.random() * 26) + 'px';
-    h.style.animationDuration = (9 + Math.random() * 12) + 's';
-    h.style.animationDelay = (-Math.random() * 20) + 's';
-    wrap.appendChild(h);
+/* ================= ФОНОВЫЕ СЕРДЕЧКИ (с лопанием) ================= */
+const heartsWrap = document.getElementById('hearts');
+const HEART_GLYPHS = ['♥', '💗', '💖', '💕', '❤'];
+
+function spawnHeart(initial) {
+  const h = document.createElement('span');
+  h.className = 'heart';
+  h.textContent = HEART_GLYPHS[Math.floor(Math.random() * HEART_GLYPHS.length)];
+  h.style.left = Math.random() * 100 + 'vw';
+  h.style.fontSize = (14 + Math.random() * 26) + 'px';
+  h.style.animationDuration = (9 + Math.random() * 12) + 's';
+  h.style.animationDelay = initial ? (-Math.random() * 20) + 's' : '0s';
+  heartsWrap.appendChild(h);
+
+  const onPop = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    popHeart(h);
+  };
+  h.addEventListener('click', onPop);
+  h.addEventListener('touchstart', onPop, { passive: false });
+
+  return h;
+}
+
+function popHeart(h) {
+  if (h.dataset.popped) return;
+  h.dataset.popped = '1';
+
+  const rect = h.getBoundingClientRect();
+  const cx = rect.left + rect.width / 2;
+  const cy = rect.top + rect.height / 2;
+
+  // Фиксируем позицию, чтобы сердечко не «прыгнуло» при смене анимации
+  h.style.animation = 'none';
+  h.style.position = 'fixed';
+  h.style.left = rect.left + 'px';
+  h.style.top = rect.top + 'px';
+  h.style.bottom = 'auto';
+
+  // принудительный reflow
+  void h.offsetWidth;
+
+  h.classList.add('popping');
+
+  // Мини-брызги
+  const burstCount = IS_MOBILE ? 4 : 6;
+  const burstGlyphs = ['💗', '💕', '💖', '♥', '✨'];
+  for (let i = 0; i < burstCount; i++) {
+    const mini = document.createElement('span');
+    mini.className = 'mini-burst';
+    mini.textContent = burstGlyphs[Math.floor(Math.random() * burstGlyphs.length)];
+    mini.style.left = cx + 'px';
+    mini.style.top = cy + 'px';
+    const angle = (Math.PI * 2 * i) / burstCount + Math.random() * .5;
+    const dist = 30 + Math.random() * 45;
+    mini.style.setProperty('--mx', (Math.cos(angle) * dist).toFixed(1) + 'px');
+    mini.style.setProperty('--my', (Math.sin(angle) * dist).toFixed(1) + 'px');
+    mini.style.fontSize = (10 + Math.random() * 8) + 'px';
+    document.body.appendChild(mini);
+    setTimeout(() => mini.remove(), 700);
   }
+
+  // Убираем и спавним новое, чтобы фон не «худел»
+  setTimeout(() => {
+    h.remove();
+    spawnHeart(false);
+  }, 500);
+}
+
+(function makeHearts() {
+  for (let i = 0; i < HEART_COUNT; i++) spawnHeart(true);
 })();
 
 /* ================= ДАННЫЕ ================= */
-
-// Комплимент для Кати
 const KATYA_COMPLIMENT = 'Катя — это человек-солнце: рядом с ней становится теплее, светлее и как-то сразу верится, что всё обязательно будет хорошо. Такие люди, как она, — редкость ☀️💗';
 
-// 💗 Пары любви
 const PAIRS = [
   [['катя', 'матвей'],    99.7],
   [['катя', 'аня'],       69],
@@ -377,7 +543,6 @@ const PAIRS = [
   [['тимофей2', 'егор'],  1000]
 ];
 
-// 💔 Пары ненависти
 const HATE_PAIRS = [
   [['манюня', 'егор'],   -100],
   [['аня', 'юра'],       -1000],
@@ -385,45 +550,25 @@ const HATE_PAIRS = [
 ];
 
 const ALIASES = {
-  // Катя
   'екатерина': 'катя', 'катерина': 'катя', 'катюша': 'катя', 'катюха': 'катя', 'кет': 'катя',
-  // Матвей
   'матя': 'матвей', 'матюша': 'матвей',
-  // Дима
   'дмитрий': 'дима', 'димон': 'дима', 'димыч': 'дима', 'димуля': 'дима',
-  // Артём
   'тема': 'артем', 'темка': 'артем', 'темочка': 'артем', 'артемий': 'артем',
-  // Аня
   'анюта': 'аня', 'анюша': 'аня', 'анна': 'аня', 'аннушка': 'аня',
-  // Тимофей
   'тима': 'тимофей', 'тимоша': 'тимофей', 'тимоха': 'тимофей',
-  // Маша
   'мария': 'маша', 'маруся': 'маша', 'машенька': 'маша',
-  // Кристина
   'крис': 'кристина', 'кристи': 'кристина', 'кристюша': 'кристина',
-  // Саша
   'александр': 'саша', 'шура': 'саша', 'сашка': 'саша', 'сашок': 'саша', 'санек': 'саша',
-  // Лера
   'валерия': 'лера', 'лерочка': 'лера', 'леруся': 'лера',
-  // Влад
   'владислав': 'влад', 'влада': 'влад', 'владос': 'влад', 'владик': 'влад',
-  // Милана
   'мила': 'милана', 'милена': 'милана', 'милашка': 'милана',
-  // Лёша
   'алексей': 'леша', 'леха': 'леша', 'лешка': 'леша', 'алеша': 'леша', 'лешенька': 'леша',
-  // Настя
   'анастасия': 'настя', 'настюша': 'настя', 'настена': 'настя', 'настенька': 'настя',
-  // Вера
   'верочка': 'вера', 'веруня': 'вера',
-  // Игорь
   'игорек': 'игорь', 'игореша': 'игорь',
-  // Егор
   'егорка': 'егор', 'егорушка': 'егор',
-  // Юра
   'юрий': 'юра', 'юрка': 'юра', 'юрец': 'юра', 'юрочка': 'юра',
-  // Инна
   'инночка': 'инна', 'иночка': 'инна',
-  // Манюня
   'манюша': 'манюня', 'манюся': 'манюня', 'маня': 'манюня'
 };
 
@@ -433,19 +578,35 @@ function norm(s) {
   return ALIASES[v] || v;
 }
 
-// Возвращает { value, label, isHate }
+// Детерминированный хеш для пары имён — рандом стабилен, пока пара та же
+function pairHash(a, b) {
+  const key = [a, b].sort().join('|');
+  let h = 2166136261;
+  for (let i = 0; i < key.length; i++) {
+    h ^= key.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return Math.abs(h);
+}
+
+// Рандом от -15 до 80 включительно (96 значений)
+function randomValueFor(a, b) {
+  return -15 + (pairHash(a, b) % 96);
+}
+
 function getCompatibility(a, b) {
   for (const [[x, y], value, label] of PAIRS) {
     if ((a === x && b === y) || (a === y && b === x)) {
-      return { value, label: label || null, isHate: false };
+      return { value, label: label || null, isHate: false, isRandom: false };
     }
   }
   for (const [[x, y], value, label] of HATE_PAIRS) {
     if ((a === x && b === y) || (a === y && b === x)) {
-      return { value, label: label || null, isHate: true };
+      return { value, label: label || null, isHate: true, isRandom: false };
     }
   }
-  return { value: 0, label: null, isHate: false };
+  const rnd = randomValueFor(a, b);
+  return { value: rnd, label: null, isHate: rnd < 0, isRandom: true };
 }
 
 function formatPercent(v) {
@@ -480,7 +641,7 @@ function verdictForHate(v) {
 }
 
 function colorsForValue(v) {
-  if (v < 0)     return { from: '#b91c3c', to: '#4a0011' }; // ненависть
+  if (v < 0)     return { from: '#b91c3c', to: '#4a0011' };
   if (v >= 1000) return { from: '#ffd700', to: '#ff5c9d' };
   if (v === 0)   return { from: '#b9a7b3', to: '#9b8794' };
   if (v < 25)    return { from: '#d4a5b8', to: '#b58ba0' };
@@ -541,7 +702,7 @@ function startTimer() {
   timerInterval = setInterval(updateAllTimers, 1000);
 }
 
-/* ================= ВЗРЫВ (сердечки или разбитые сердца) ================= */
+/* ================= ВЗРЫВ ПОСЛЕ РАСЧЁТА ================= */
 function heartBurst(container, mode) {
   const isHate = mode === 'hate';
   const rect = container.getBoundingClientRect();
@@ -550,7 +711,7 @@ function heartBurst(container, mode) {
   const emojis = isHate
     ? ['💔', '🖤', '💀', '⚡', '🥀', '❌']
     : ['💗', '💖', '💕', '❤️', '💞', '💘'];
-  const count = isHate ? 26 : 32;
+  const count = isHate ? (IS_MOBILE ? 16 : 26) : (IS_MOBILE ? 22 : 32);
 
   for (let i = 0; i < count; i++) {
     const h = document.createElement('span');
@@ -737,7 +898,6 @@ function calculate() {
   const barWidth = Math.min(Math.abs(value), 100);
 
   if (isHate) {
-    // ====== БЛОК НЕНАВИСТИ ======
     resultBox.innerHTML = `
       <div class="hate-block">
         <div class="hate-title">💔 Блок ненависти 💔</div>
@@ -751,7 +911,6 @@ function calculate() {
     `;
     heartBurst(card, 'hate');
   } else {
-    // ====== БЛОК ЛЮБВИ ======
     resultBox.innerHTML = `
       ${label ? `<div class="label-badge">${label}</div>` : ''}
       <div class="percent-label">Совместимость</div>
