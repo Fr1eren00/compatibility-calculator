@@ -41,7 +41,6 @@
     --hate-border: rgba(255, 60, 90, 0.3);
   }
 
-  /* ===== СЕЗОННЫЕ ТЕМЫ (только для светлой) ===== */
   html:not([data-theme="dark"]) body.season-winter {
     --bg-1: #eaf3ff; --bg-2: #dbe7ff; --bg-3: #c5d6ff;
     --heart-bg: #a8c9ff; --input-border: #c8d8ff; --input-focus: #8fb5ff;
@@ -164,7 +163,6 @@
     100% { transform: translate(calc(-50% + var(--mx)), calc(-50% + var(--my))) scale(.2); opacity: 0; }
   }
 
-  /* ===== ТОСТ (для секретов) ===== */
   .toast {
     position: fixed; bottom: 30px; left: 50%;
     transform: translate(-50%, 20px);
@@ -349,17 +347,18 @@
   .share-btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
   .share-btn:active { transform: scale(.97); }
 
-  #timer {
+  /* Общие стили для обоих таймеров */
+  #timer, #timerIgnat {
     margin-top: 26px; padding-top: 22px;
     border-top: 2px dashed var(--dashed);
     opacity: 0; max-height: 0; overflow: hidden;
     transition: opacity .5s ease, max-height .8s ease, padding-top .5s, margin-top .5s, border-color .5s;
   }
-  #timer.show { opacity: 1; max-height: 1400px; }
+  #timer.show, #timerIgnat.show { opacity: 1; max-height: 1400px; }
   .timer-section { margin-bottom: 22px; }
   .timer-section:last-child { margin-bottom: 0; }
-  #timer h2 { font-size: 1.1rem; color: var(--accent); margin-bottom: 4px; transition: color .5s; }
-  #timer .since { font-size: .8rem; color: var(--text-sub); margin-bottom: 14px; transition: color .5s; }
+  #timer h2, #timerIgnat h2 { font-size: 1.1rem; color: var(--accent); margin-bottom: 4px; transition: color .5s; }
+  #timer .since, #timerIgnat .since { font-size: .8rem; color: var(--text-sub); margin-bottom: 14px; transition: color .5s; }
   .timer-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
   .timer-cell {
     background: linear-gradient(160deg, var(--timer-cell-bg-1), var(--timer-cell-bg-2));
@@ -420,8 +419,8 @@
     .timer-cell { padding: 10px 2px 8px; border-radius: 12px; }
     .timer-cell .num { font-size: 1.05rem; }
     .timer-cell .unit { font-size: .62rem; margin-top: 3px; }
-    #timer h2 { font-size: 1rem; }
-    #timer .since { font-size: .74rem; margin-bottom: 10px; }
+    #timer h2, #timerIgnat h2 { font-size: 1rem; }
+    #timer .since, #timerIgnat .since { font-size: .74rem; margin-bottom: 10px; }
     .compliment-box { font-size: .88rem; padding: 16px 14px 12px; }
     .compliment-box .heart-top { font-size: 1.3rem; }
     .compliment-box .tag { font-size: .72rem; }
@@ -474,6 +473,7 @@
 
     <div id="result"></div>
 
+    <!-- Таймеры Кати + Матвея -->
     <div id="timer">
       <div class="timer-section">
         <h2>Мы вместе уже 💞</h2>
@@ -503,6 +503,30 @@
           <div class="timer-cell"><span class="num" id="m-hours">00</span><span class="unit">часов</span></div>
           <div class="timer-cell"><span class="num" id="m-mins">00</span><span class="unit">минут</span></div>
           <div class="timer-cell"><span class="num" id="m-secs">00</span><span class="unit">секунд</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Таймеры Игната + Кристины -->
+    <div id="timerIgnat">
+      <div class="timer-section">
+        <h2>До дня рождения Игната 🎂</h2>
+        <p class="since">6 февраля · <span id="ignat-age">…</span></p>
+        <div class="timer-grid">
+          <div class="timer-cell"><span class="num" id="i-days">0</span><span class="unit">дней</span></div>
+          <div class="timer-cell"><span class="num" id="i-hours">00</span><span class="unit">часов</span></div>
+          <div class="timer-cell"><span class="num" id="i-mins">00</span><span class="unit">минут</span></div>
+          <div class="timer-cell"><span class="num" id="i-secs">00</span><span class="unit">секунд</span></div>
+        </div>
+      </div>
+      <div class="timer-section">
+        <h2>До дня рождения Кристины 🎂</h2>
+        <p class="since">5 июня · <span id="kristina-age">…</span></p>
+        <div class="timer-grid">
+          <div class="timer-cell"><span class="num" id="kr-days">0</span><span class="unit">дней</span></div>
+          <div class="timer-cell"><span class="num" id="kr-hours">00</span><span class="unit">часов</span></div>
+          <div class="timer-cell"><span class="num" id="kr-mins">00</span><span class="unit">минут</span></div>
+          <div class="timer-cell"><span class="num" id="kr-secs">00</span><span class="unit">секунд</span></div>
         </div>
       </div>
     </div>
@@ -603,7 +627,6 @@ function spawnHeart(initial) {
   return h;
 }
 
-/* ===== ПАСХАЛКА 3: 5 кликов на сердечко ===== */
 let heartPops = 0;
 let secretShown = false;
 
@@ -611,7 +634,6 @@ function popHeart(h) {
   if (h.dataset.popped) return;
   h.dataset.popped = '1';
 
-  // считаем лопания для секрета
   heartPops++;
   if (heartPops >= 5 && !secretShown) {
     secretShown = true;
@@ -698,7 +720,6 @@ const PAIRS = [
   [['маша', 'костя'],     99.9, 'привет вам'],
   [['вика', 'чекушка'],   101,  'любовь навеки'],
   [['настя', 'никита'],   167,  'Никита уебище слушайся настю💕💕💕'],
-  // ===== ПАСХАЛКА 1: «я» + «ты» =====
   [['я', 'ты'],           100,  'ну конечно 💗']
 ];
 
@@ -706,7 +727,6 @@ const HATE_PAIRS = [
   [['манюня', 'егор'],   -100],
   [['аня', 'юра'],       -1000],
   [['кристина', 'инна'], -95],
-  // ===== ПАСХАЛКА 2: «кофе» + «сон» =====
   [['кофе', 'сон'],      -50, 'вечная борьба']
 ];
 
@@ -735,7 +755,8 @@ const ALIASES = {
   'шрек': 'игнат', 'фиона': 'фиона',
   'виктория': 'вика', 'викуля': 'вика', 'викуся': 'вика', 'викуша': 'вика', 'викулечка': 'вика',
   'алкашка': 'чекушка', 'винище': 'чекушка', 'бадяга': 'чекушка', 'самогон': 'чекушка', 'самогонка': 'чекушка',
-  'пиво': 'чекушка', 'пивас': 'чекушка', 'пивасик': 'чекушка', 'спиртное': 'чекушка', 'горящая вода': 'чекушка'
+  'пиво': 'чекушка', 'пивас': 'чекушка', 'пивасик': 'чекушка', 'спиртное': 'чекушка', 'горящая вода': 'чекушка',
+  'никита': 'уебан'
 };
 
 /* ================= ЛОГИКА ================= */
@@ -778,7 +799,6 @@ function formatPercent(v) {
   return s + '%';
 }
 
-/* ===== УРОВНИ ОТНОШЕНИЙ ===== */
 function levelFor(v) {
   if (v >= 1000) return '👑 Легендарная пара';
   if (v >= 101)  return '💞 Любовь сильнее математики';
@@ -801,7 +821,6 @@ function levelFor(v) {
   return '☠️ Заклятые враги навеки';
 }
 
-/* ===== МЕМ-ФРАЗОЧКИ ===== */
 const LOVE_MEMES = [
   'Это не совместимость, это диагноз 😅',
   'Такие пары называют «созданы друг для друга»',
@@ -869,9 +888,11 @@ function colorsForValue(v) {
 }
 
 /* ================= ТАЙМЕРЫ ================= */
-const START_DATE    = new Date(2026, 7, 30, 21, 0, 0);
-const KATYA_BIRTH   = { year: 2008, month: 11, day: 21 };
-const MATVEY_BIRTH  = { year: 2008, month: 11, day: 14 };
+const START_DATE       = new Date(2026, 7, 30, 21, 0, 0);
+const KATYA_BIRTH      = { year: 2008, month: 11, day: 21 };
+const MATVEY_BIRTH     = { year: 2008, month: 11, day: 14 };
+const IGNAT_BIRTH      = { year: 2009, month: 2,  day: 6 };
+const KRISTINA_BIRTH   = { year: 2009, month: 6,  day: 5 };
 
 function nextBirthday(month, day) {
   const now = new Date();
@@ -906,17 +927,27 @@ function renderTimer(prefix, diff) {
 }
 function updateAllTimers() {
   const now = Date.now();
-  renderTimer('t', now - START_DATE.getTime());
-  renderTimer('k', nextBirthday(KATYA_BIRTH.month, KATYA_BIRTH.day).getTime() - now);
-  renderTimer('m', nextBirthday(MATVEY_BIRTH.month, MATVEY_BIRTH.day).getTime() - now);
-  document.getElementById('katya-age').textContent  = 'исполнится ' + (calcAge(KATYA_BIRTH) + 1);
-  document.getElementById('matvey-age').textContent = 'исполнится ' + (calcAge(MATVEY_BIRTH) + 1);
+  // Катя + Матвей
+  renderTimer('t',  now - START_DATE.getTime());
+  renderTimer('k',  nextBirthday(KATYA_BIRTH.month, KATYA_BIRTH.day).getTime() - now);
+  renderTimer('m',  nextBirthday(MATVEY_BIRTH.month, MATVEY_BIRTH.day).getTime() - now);
+  // Игнат + Кристина
+  renderTimer('i',  nextBirthday(IGNAT_BIRTH.month, IGNAT_BIRTH.day).getTime() - now);
+  renderTimer('kr', nextBirthday(KRISTINA_BIRTH.month, KRISTINA_BIRTH.day).getTime() - now);
+
+  document.getElementById('katya-age').textContent    = 'исполнится ' + (calcAge(KATYA_BIRTH) + 1);
+  document.getElementById('matvey-age').textContent   = 'исполнится ' + (calcAge(MATVEY_BIRTH) + 1);
+  document.getElementById('ignat-age').textContent    = 'исполнится ' + (calcAge(IGNAT_BIRTH) + 1);
+  document.getElementById('kristina-age').textContent = 'исполнится ' + (calcAge(KRISTINA_BIRTH) + 1);
 }
 let timerInterval = null;
 function startTimer() {
   updateAllTimers();
   if (timerInterval) clearInterval(timerInterval);
   timerInterval = setInterval(updateAllTimers, 1000);
+}
+function stopTimer() {
+  if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
 }
 
 /* ================= ВЗРЫВ ПОСЛЕ РАСЧЁТА ================= */
@@ -1046,12 +1077,10 @@ function generateShareImage(a, b, percent, verdict, label, isHate, level, meme) 
   ctx.font = 'bold 190px "Segoe UI", sans-serif';
   ctx.fillText(formatPercent(percent), W / 2, 440);
 
-  // Уровень отношений
   ctx.fillStyle = isHate ? '#ff8fa8' : '#d6337c';
   ctx.font = 'bold 26px "Segoe UI", sans-serif';
   ctx.fillText(level, W / 2, 555);
 
-  // Вердикт
   ctx.fillStyle = isHate ? '#ffb0c2' : '#c9538a';
   ctx.font = '28px "Segoe UI", sans-serif';
   const words = verdict.split(' ');
@@ -1064,7 +1093,6 @@ function generateShareImage(a, b, percent, verdict, label, isHate, level, meme) 
   let startY = 630;
   lines.forEach((l, i) => ctx.fillText(l, W / 2, startY + i * 36));
 
-  // Мем
   ctx.fillStyle = isHate ? '#c9899a' : '#b56b8f';
   ctx.font = 'italic 22px "Segoe UI", sans-serif';
   const memeText = '«' + meme + '»';
@@ -1107,9 +1135,10 @@ async function shareResult() {
 }
 
 /* ================= ОСНОВНАЯ ФУНКЦИЯ ================= */
-const resultBox = document.getElementById('result');
-const timerBox  = document.getElementById('timer');
-const card      = document.getElementById('card');
+const resultBox   = document.getElementById('result');
+const timerBox    = document.getElementById('timer');
+const timerIgnat  = document.getElementById('timerIgnat');
+const card        = document.getElementById('card');
 
 function calculate() {
   const rawA = document.getElementById('name1').value.trim();
@@ -1120,7 +1149,8 @@ function calculate() {
   if (!n1 || !n2) {
     resultBox.innerHTML = '<p class="verdict">Введите оба имени, пожалуйста 🙏</p>';
     timerBox.classList.remove('show');
-    if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+    timerIgnat.classList.remove('show');
+    stopTimer();
     return;
   }
 
@@ -1135,6 +1165,10 @@ function calculate() {
   const isKatyaMatvey =
     (n1 === 'катя' && n2 === 'матвей') ||
     (n1 === 'матвей' && n2 === 'катя');
+
+  const isIgnatKristina =
+    (n1 === 'игнат' && (n2 === 'кристина' || n2 === 'фиона')) ||
+    ((n1 === 'кристина' || n1 === 'фиона') && n2 === 'игнат');
 
   const barWidth = Math.min(Math.abs(value), 100);
 
@@ -1183,12 +1217,19 @@ function calculate() {
 
   document.getElementById('shareBtn').onclick = shareResult;
 
+  // Показываем нужный таймер (или никакой)
   if (isKatyaMatvey) {
     timerBox.classList.add('show');
+    timerIgnat.classList.remove('show');
+    startTimer();
+  } else if (isIgnatKristina) {
+    timerBox.classList.remove('show');
+    timerIgnat.classList.add('show');
     startTimer();
   } else {
     timerBox.classList.remove('show');
-    if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+    timerIgnat.classList.remove('show');
+    stopTimer();
   }
 }
 
