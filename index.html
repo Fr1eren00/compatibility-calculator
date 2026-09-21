@@ -41,21 +41,54 @@
     --hate-border: rgba(255, 60, 90, 0.3);
   }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  /* ===== СЕЗОННЫЕ ТЕМЫ (только для светлой) ===== */
+  html:not([data-theme="dark"]) body.season-winter {
+    --bg-1: #eaf3ff; --bg-2: #dbe7ff; --bg-3: #c5d6ff;
+    --heart-bg: #a8c9ff; --input-border: #c8d8ff; --input-focus: #8fb5ff;
+    --bar-bg: #dbe8ff; --timer-cell-border: #d8e4ff; --dashed: #d8e4ff;
+  }
+  html:not([data-theme="dark"]) body.season-spring {
+    --bg-1: #eaffe4; --bg-2: #dcf5d8; --bg-3: #c8edc4;
+    --heart-bg: #ffa8cb; --input-border: #d4f0ce; --input-focus: #a8e29c;
+    --bar-bg: #e4f5de; --timer-cell-border: #d4f0ce; --dashed: #d4f0ce;
+  }
+  html:not([data-theme="dark"]) body.season-summer {
+    --bg-1: #fff3d6; --bg-2: #ffe4c2; --bg-3: #ffd1a8;
+    --heart-bg: #ffb347; --input-border: #ffe0b8; --input-focus: #ffc478;
+    --bar-bg: #ffedd0; --timer-cell-border: #ffe0b8; --dashed: #ffe0b8;
+  }
+  html:not([data-theme="dark"]) body.season-autumn {
+    --bg-1: #ffecd1; --bg-2: #ffd9ae; --bg-3: #f5c088;
+    --heart-bg: #e08b3c; --input-border: #f5d3a6; --input-focus: #e8a860;
+    --bar-bg: #ffe5c8; --timer-cell-border: #f5d3a6; --dashed: #f5d3a6;
+  }
+  html:not([data-theme="dark"]) body.season-halloween {
+    --bg-1: #ffe0c2; --bg-2: #ffc89a; --bg-3: #f5a86f;
+    --heart-bg: #ff8b3d; --input-border: #ffd0a0; --input-focus: #ff9e50;
+    --bar-bg: #ffdabb; --timer-cell-border: #ffd0a0; --dashed: #ffd0a0;
+  }
+  html:not([data-theme="dark"]) body.season-newyear {
+    --bg-1: #e6efff; --bg-2: #d0dfff; --bg-3: #b8ccf5;
+    --heart-bg: #9ec5ff; --input-border: #c8d8ff; --input-focus: #8fb5ff;
+    --bar-bg: #dbe8ff; --timer-cell-border: #d8e4ff; --dashed: #d8e4ff;
+  }
+  html:not([data-theme="dark"]) body.season-valentine {
+    --bg-1: #ffe4ee; --bg-2: #ffd6e7; --bg-3: #ffc9de;
+    --heart-bg: #ff6fa8;
+  }
 
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   html { -webkit-text-size-adjust: 100%; }
 
   body {
-    min-height: 100vh;
-    min-height: 100dvh;
+    min-height: 100vh; min-height: 100dvh;
     font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
     background: linear-gradient(160deg, var(--bg-1) 0%, var(--bg-2) 40%, var(--bg-3) 100%);
     display: flex; align-items: center; justify-content: center;
     padding: 20px;
     padding: max(20px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right)) max(20px, env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left));
-    overflow-x: hidden;
-    position: relative;
-    transition: background .5s;
+    overflow-x: hidden; position: relative;
+    transition: background .6s;
   }
 
   #themeToggle {
@@ -74,19 +107,31 @@
   #themeToggle:hover { transform: scale(1.1) rotate(15deg); }
   #themeToggle:active { transform: scale(.95); }
 
+  .season-badge {
+    position: fixed;
+    top: max(20px, env(safe-area-inset-top)); left: max(20px, env(safe-area-inset-left));
+    padding: 8px 14px; border-radius: 20px;
+    background: var(--card-bg);
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    border: 1.5px solid var(--card-border);
+    font-size: .78rem; font-weight: 600;
+    color: var(--accent);
+    box-shadow: 0 4px 12px rgba(255, 120, 170, .2);
+    z-index: 100; pointer-events: none;
+    transition: background .5s, color .5s, border-color .5s;
+    animation: badgeIn .6s ease;
+  }
+
   #hearts { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; }
 
   .heart {
-    position: absolute;
-    bottom: -60px;
+    position: absolute; bottom: -60px;
     color: var(--heart-bg);
     animation-name: floatUp;
     animation-timing-function: linear;
     animation-iteration-count: infinite;
-    opacity: 0;
-    user-select: none;
-    pointer-events: auto;
-    cursor: pointer;
+    opacity: 0; user-select: none;
+    pointer-events: auto; cursor: pointer;
     transition: color .5s;
     transform-origin: center;
     will-change: transform, opacity;
@@ -98,7 +143,6 @@
     100% { transform: translateY(-115vh) rotate(40deg) scale(1.2); opacity: 0; }
   }
 
-  /* Лопание сердечка */
   .heart.popping {
     animation: popHeart .45s cubic-bezier(.2, .8, .4, 1) forwards !important;
     pointer-events: none;
@@ -109,13 +153,9 @@
     100% { transform: scale(.15) rotate(-15deg); opacity: 0; }
   }
 
-  /* Мини-брызги при лопании */
   .mini-burst {
-    position: fixed;
-    pointer-events: none;
-    font-size: 14px;
-    z-index: 200;
-    transform: translate(-50%, -50%);
+    position: fixed; pointer-events: none; font-size: 14px;
+    z-index: 200; transform: translate(-50%, -50%);
     animation: miniBurst .6s ease-out forwards;
     will-change: transform, opacity;
   }
@@ -123,6 +163,23 @@
     0%   { transform: translate(-50%, -50%) scale(.4); opacity: 1; }
     100% { transform: translate(calc(-50% + var(--mx)), calc(-50% + var(--my))) scale(.2); opacity: 0; }
   }
+
+  /* ===== ТОСТ (для секретов) ===== */
+  .toast {
+    position: fixed; bottom: 30px; left: 50%;
+    transform: translate(-50%, 20px);
+    background: var(--card-bg);
+    border: 1.5px solid var(--card-border);
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    padding: 14px 22px; border-radius: 16px;
+    color: var(--accent);
+    font-size: .9rem; font-weight: 600;
+    box-shadow: 0 10px 30px rgba(255, 120, 170, .35);
+    opacity: 0; transition: opacity .35s, transform .35s;
+    z-index: 1000; pointer-events: none;
+    text-align: center; max-width: 90vw;
+  }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
 
   .container {
     position: relative; z-index: 1;
@@ -140,26 +197,19 @@
   .subtitle { color: var(--text-sub); font-size: .9rem; margin-bottom: 24px; transition: color .5s; }
 
   input {
-    width: 100%;
-    padding: 14px 18px;
-    border-radius: 14px;
+    width: 100%; padding: 14px 18px; border-radius: 14px;
     border: 2px solid var(--input-border);
     background: var(--input-bg);
-    font-size: 16px;
-    font-family: inherit;
-    color: var(--text-main);
-    outline: none;
-    transition: border-color .25s, box-shadow .25s;
-    margin-bottom: 12px;
-    text-align: center;
+    font-size: 16px; font-family: inherit;
+    color: var(--text-main); outline: none;
+    transition: border-color .25s, box-shadow .25s, background .5s;
+    margin-bottom: 12px; text-align: center;
   }
   input::placeholder { color: var(--text-sub); opacity: .6; }
   input:focus { border-color: var(--input-focus); box-shadow: 0 0 0 4px rgba(255, 158, 196, .25); }
 
   button.main-btn {
-    width: 100%;
-    padding: 15px;
-    margin-top: 6px;
+    width: 100%; padding: 15px; margin-top: 6px;
     border: none; border-radius: 14px;
     background: linear-gradient(135deg, #ff9ec4, #ff6fa8);
     color: #fff; font-size: 1.05rem; font-weight: 600; font-family: inherit;
@@ -199,10 +249,32 @@
     font-variant-numeric: tabular-nums; transition: background .5s;
   }
   .percent-label { color: var(--text-sub); font-size: .95rem; margin-bottom: 8px; transition: color .5s; }
+
+  .level-badge {
+    display: inline-block;
+    margin: 8px 0 4px;
+    padding: 5px 16px;
+    background: rgba(255, 158, 196, 0.22);
+    border: 1px solid rgba(255, 158, 196, 0.45);
+    border-radius: 14px;
+    font-size: .84rem; font-weight: 600;
+    color: var(--accent);
+    letter-spacing: .3px;
+    transition: background .5s, border-color .5s, color .5s;
+    animation: badgeIn .55s ease;
+  }
+  .hate-level {
+    background: rgba(185, 28, 60, 0.15);
+    border-color: rgba(185, 28, 60, 0.4);
+    color: #b91c3c;
+  }
+  [data-theme="dark"] .hate-level { color: #ff5b7f; }
+  [data-theme="dark"] .level-badge { background: rgba(255, 158, 196, 0.15); }
+
   .bar {
     height: 12px; background: var(--bar-bg);
     border-radius: 10px; overflow: hidden;
-    margin: 14px 0 4px; transition: background .5s;
+    margin: 12px 0 4px; transition: background .5s;
   }
   .bar-fill {
     height: 100%; width: 0;
@@ -211,6 +283,17 @@
     transition: width 1.2s cubic-bezier(.22, 1, .36, 1), background .5s;
   }
   .verdict { color: var(--text-sub); font-size: .95rem; margin-top: 8px; transition: color .5s; }
+
+  .meme-phrase {
+    margin: 10px 12px 0;
+    font-size: .85rem;
+    color: var(--text-sub);
+    font-style: italic;
+    opacity: .9;
+    line-height: 1.4;
+    transition: color .5s;
+    animation: badgeIn .65s ease;
+  }
 
   .hate-block {
     background: linear-gradient(160deg, var(--hate-bg), rgba(120, 0, 30, 0.08));
@@ -306,45 +389,44 @@
     100% { transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(1.1) rotate(var(--rot)); opacity: 0; }
   }
 
-  /* ====== МОБИЛЬНАЯ ОПТИМИЗАЦИЯ ====== */
+  .visit-counter {
+    margin-top: 22px;
+    font-size: .78rem;
+    color: var(--text-sub);
+    opacity: .85;
+    letter-spacing: .3px;
+    transition: color .5s, opacity .3s;
+  }
+  .visit-counter span {
+    font-weight: 700;
+    color: var(--accent);
+    transition: color .5s;
+  }
+  .visit-counter.loaded { opacity: 1; }
+
   @media (max-width: 480px) {
     body { padding: 12px; }
-
-    .container {
-      padding: 26px 18px 22px;
-      border-radius: 22px;
-    }
+    .container { padding: 26px 18px 22px; border-radius: 22px; }
     h1 { font-size: 1.35rem; }
     .subtitle { font-size: .82rem; margin-bottom: 18px; }
-
-    input {
-      padding: 14px 14px;
-      font-size: 16px;
-      margin-bottom: 10px;
-    }
-    button.main-btn {
-      padding: 15px;
-      font-size: 1rem;
-    }
-
+    input { padding: 14px 14px; font-size: 16px; margin-bottom: 10px; }
+    button.main-btn { padding: 15px; font-size: 1rem; }
     .percent { font-size: 2.6rem; }
     .percent-label { font-size: .88rem; }
     .verdict { font-size: .88rem; }
-
+    .meme-phrase { font-size: .8rem; }
+    .level-badge { font-size: .78rem; padding: 4px 13px; }
     .timer-grid { gap: 6px; }
     .timer-cell { padding: 10px 2px 8px; border-radius: 12px; }
     .timer-cell .num { font-size: 1.05rem; }
     .timer-cell .unit { font-size: .62rem; margin-top: 3px; }
     #timer h2 { font-size: 1rem; }
     #timer .since { font-size: .74rem; margin-bottom: 10px; }
-
     .compliment-box { font-size: .88rem; padding: 16px 14px 12px; }
     .compliment-box .heart-top { font-size: 1.3rem; }
     .compliment-box .tag { font-size: .72rem; }
-
     .hate-block { padding: 18px 14px 14px; border-radius: 16px; }
     .hate-title { font-size: .78rem; letter-spacing: 1px; }
-
     .label-badge { font-size: .75rem; padding: 5px 14px; margin-bottom: 10px; }
     .share-btn { font-size: .85rem; padding: 11px 16px; margin-top: 14px; }
     #themeToggle {
@@ -352,6 +434,12 @@
       top: max(12px, env(safe-area-inset-top));
       right: max(12px, env(safe-area-inset-right));
     }
+    .season-badge {
+      top: max(12px, env(safe-area-inset-top));
+      left: max(12px, env(safe-area-inset-left));
+      padding: 6px 11px; font-size: .72rem;
+    }
+    .toast { font-size: .82rem; padding: 12px 18px; bottom: 20px; }
   }
 
   @media (max-width: 360px) {
@@ -364,7 +452,6 @@
     .container { padding: 22px 14px 20px; }
   }
 
-  /* Отключаем анимации для тех, кто просит */
   @media (prefers-reduced-motion: reduce) {
     .heart, .burst-heart, .mini-burst { animation-duration: .01s !important; }
     * { transition-duration: .01s !important; }
@@ -373,6 +460,7 @@
 </head>
 <body>
 
+  <div class="season-badge" id="seasonBadge">…</div>
   <button id="themeToggle" title="Переключить тему">🌙</button>
   <div id="hearts"></div>
 
@@ -418,12 +506,57 @@
         </div>
       </div>
     </div>
+
+    <div class="visit-counter" id="visitCounter">
+      👀 Сайт посмотрели <span id="visitCount">…</span> раз
+    </div>
   </div>
 
 <script>
 /* ================= РАЗМЕРЫ ПОД УСТРОЙСТВО ================= */
 const IS_MOBILE = window.matchMedia('(max-width: 600px)').matches;
 const HEART_COUNT = IS_MOBILE ? 12 : 22;
+
+/* ================= СЕЗОННАЯ ТЕМА ================= */
+function getSeason() {
+  const now = new Date();
+  const m = now.getMonth() + 1;
+  const d = now.getDate();
+
+  if (m === 2 && d >= 7 && d <= 15) return 'valentine';
+  if (m === 10 && d >= 24 && d <= 31) return 'halloween';
+  if ((m === 12 && d >= 25) || (m === 1 && d <= 10)) return 'newyear';
+
+  if (m === 12 || m <= 2) return 'winter';
+  if (m >= 3 && m <= 5) return 'spring';
+  if (m >= 6 && m <= 8) return 'summer';
+  return 'autumn';
+}
+
+const SEASON_GLYPHS = {
+  winter:    ['❄️', '❄', '⛄', '♥', '💙'],
+  spring:    ['🌸', '🌷', '🌼', '♥', '💗'],
+  summer:    ['☀️', '🌻', '🌴', '♥', '💛'],
+  autumn:    ['🍁', '🍂', '🌰', '♥', '🧡'],
+  halloween: ['🎃', '👻', '🦇', '♥', '🖤'],
+  newyear:   ['❄️', '🎄', '🎁', '⭐', '♥'],
+  valentine: ['💗', '💖', '💕', '💘', '♥']
+};
+
+const SEASON_LABELS = {
+  winter:    '❄️ Зима',
+  spring:    '🌸 Весна',
+  summer:    '☀️ Лето',
+  autumn:    '🍁 Осень',
+  halloween: '🎃 Хэллоуин',
+  newyear:   '🎄 Новый год',
+  valentine: '💘 14 февраля'
+};
+
+const CURRENT_SEASON = getSeason();
+document.body.classList.add('season-' + CURRENT_SEASON);
+document.getElementById('seasonBadge').textContent = SEASON_LABELS[CURRENT_SEASON];
+const CURRENT_GLYPHS = SEASON_GLYPHS[CURRENT_SEASON] || SEASON_GLYPHS.valentine;
 
 /* ================= ТЕМА ================= */
 (function initTheme() {
@@ -446,14 +579,13 @@ document.getElementById('themeToggle').addEventListener('click', () => {
   }
 });
 
-/* ================= ФОНОВЫЕ СЕРДЕЧКИ (с лопанием) ================= */
+/* ================= ФОНОВЫЕ СЕРДЕЧКИ ================= */
 const heartsWrap = document.getElementById('hearts');
-const HEART_GLYPHS = ['♥', '💗', '💖', '💕', '❤'];
 
 function spawnHeart(initial) {
   const h = document.createElement('span');
   h.className = 'heart';
-  h.textContent = HEART_GLYPHS[Math.floor(Math.random() * HEART_GLYPHS.length)];
+  h.textContent = CURRENT_GLYPHS[Math.floor(Math.random() * CURRENT_GLYPHS.length)];
   h.style.left = Math.random() * 100 + 'vw';
   h.style.fontSize = (14 + Math.random() * 26) + 'px';
   h.style.animationDuration = (9 + Math.random() * 12) + 's';
@@ -471,27 +603,34 @@ function spawnHeart(initial) {
   return h;
 }
 
+/* ===== ПАСХАЛКА 3: 5 кликов на сердечко ===== */
+let heartPops = 0;
+let secretShown = false;
+
 function popHeart(h) {
   if (h.dataset.popped) return;
   h.dataset.popped = '1';
+
+  // считаем лопания для секрета
+  heartPops++;
+  if (heartPops >= 5 && !secretShown) {
+    secretShown = true;
+    setTimeout(() => showToast('🎉 Ты нашёл(ла) секрет! Передай Кате и Матвею, что они — лучшая пара 💗'), 500);
+  }
 
   const rect = h.getBoundingClientRect();
   const cx = rect.left + rect.width / 2;
   const cy = rect.top + rect.height / 2;
 
-  // Фиксируем позицию, чтобы сердечко не «прыгнуло» при смене анимации
   h.style.animation = 'none';
   h.style.position = 'fixed';
   h.style.left = rect.left + 'px';
   h.style.top = rect.top + 'px';
   h.style.bottom = 'auto';
 
-  // принудительный reflow
   void h.offsetWidth;
-
   h.classList.add('popping');
 
-  // Мини-брызги
   const burstCount = IS_MOBILE ? 4 : 6;
   const burstGlyphs = ['💗', '💕', '💖', '♥', '✨'];
   for (let i = 0; i < burstCount; i++) {
@@ -509,7 +648,6 @@ function popHeart(h) {
     setTimeout(() => mini.remove(), 700);
   }
 
-  // Убираем и спавним новое, чтобы фон не «худел»
   setTimeout(() => {
     h.remove();
     spawnHeart(false);
@@ -519,6 +657,19 @@ function popHeart(h) {
 (function makeHearts() {
   for (let i = 0; i < HEART_COUNT; i++) spawnHeart(true);
 })();
+
+/* ================= ТОСТ ================= */
+function showToast(msg) {
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  requestAnimationFrame(() => t.classList.add('show'));
+  setTimeout(() => {
+    t.classList.remove('show');
+    setTimeout(() => t.remove(), 400);
+  }, 4000);
+}
 
 /* ================= ДАННЫЕ ================= */
 const KATYA_COMPLIMENT = 'Катя — это человек-солнце: рядом с ней становится теплее, светлее и как-то сразу верится, что всё обязательно будет хорошо. Такие люди, как она, — редкость ☀️💗';
@@ -542,16 +693,20 @@ const PAIRS = [
   [['буля', 'хуня'],      1000],
   [['тимофей2', 'егор'],  1000],
   [['ваня', 'маша'],      89],
-  [['игнат', 'кристина'], 999, 'Шрек и Фиона'],
-  [['игнат', 'фиона'],    999, 'Шрек и Фиона'],
+  [['игнат', 'кристина'], 99.5, 'Шрек и Фиона'],
+  [['игнат', 'фиона'],    99.5, 'Шрек и Фиона'],
   [['маша', 'костя'],     99.9, 'привет вам'],
-  [['вика', 'чекушка'],   101,  'любовь на веки']
+  [['вика', 'чекушка'],   101,  'любовь навеки'],
+  // ===== ПАСХАЛКА 1: «я» + «ты» =====
+  [['я', 'ты'],           100,  'ну конечно 💗']
 ];
 
 const HATE_PAIRS = [
   [['манюня', 'егор'],   -100],
   [['аня', 'юра'],       -1000],
-  [['кристина', 'инна'], -95]
+  [['кристина', 'инна'], -95],
+  // ===== ПАСХАЛКА 2: «кофе» + «сон» =====
+  [['кофе', 'сон'],      -50, 'вечная борьба']
 ];
 
 const ALIASES = {
@@ -576,10 +731,10 @@ const ALIASES = {
   'инночка': 'инна', 'иночка': 'инна',
   'манюша': 'манюня', 'манюся': 'манюня', 'маня': 'манюня',
   'ванюша': 'ваня', 'иван': 'ваня', 'ванек': 'ваня', 'ванька': 'ваня', 'ванечка': 'ваня',
-  'шрек': 'игнат', 'еблан': 'игнат',
-  'фиона':  'фиона',
+  'шрек': 'игнат', 'фиона': 'фиона',
   'виктория': 'вика', 'викуля': 'вика', 'викуся': 'вика', 'викуша': 'вика', 'викулечка': 'вика',
-  'алкашка': 'чекушка', 'винище': 'чекушка', 'бадяга': 'чекушка', 'самогон': 'чекушка', 'самогонка': 'чекушка', 'пиво': 'чекушка', 'пивас': 'чекушка', 'пивасик': 'чекушка', 'спиртное': 'чекушка', 'горящая вода': 'чекушка'
+  'алкашка': 'чекушка', 'винище': 'чекушка', 'бадяга': 'чекушка', 'самогон': 'чекушка', 'самогонка': 'чекушка',
+  'пиво': 'чекушка', 'пивас': 'чекушка', 'пивасик': 'чекушка', 'спиртное': 'чекушка', 'горящая вода': 'чекушка'
 };
 
 /* ================= ЛОГИКА ================= */
@@ -588,7 +743,6 @@ function norm(s) {
   return ALIASES[v] || v;
 }
 
-// Детерминированный хеш для пары имён — рандом стабилен, пока пара та же
 function pairHash(a, b) {
   const key = [a, b].sort().join('|');
   let h = 2166136261;
@@ -599,7 +753,6 @@ function pairHash(a, b) {
   return Math.abs(h);
 }
 
-// Рандом от -15 до 80 включительно (96 значений)
 function randomValueFor(a, b) {
   return -15 + (pairHash(a, b) % 96);
 }
@@ -622,6 +775,59 @@ function getCompatibility(a, b) {
 function formatPercent(v) {
   const s = Number.isInteger(v) ? String(v) : v.toFixed(1).replace('.', ',');
   return s + '%';
+}
+
+/* ===== УРОВНИ ОТНОШЕНИЙ ===== */
+function levelFor(v) {
+  if (v >= 1000) return '👑 Легендарная пара';
+  if (v >= 101)  return '💞 Любовь сильнее математики';
+  if (v >= 99)   return '💗 Соулмейты';
+  if (v >= 95)   return '💖 Настоящая любовь';
+  if (v >= 90)   return '💘 Влюблённость';
+  if (v >= 80)   return '💕 Симпатия';
+  if (v >= 70)   return '🤗 Лучшие друзья';
+  if (v >= 55)   return '😊 Хорошие друзья';
+  if (v >= 40)   return '👋 Друзья';
+  if (v >= 25)   return '🙂 Хорошие знакомые';
+  if (v >= 10)   return '🤝 Приятели';
+  if (v >= 1)    return '👤 Знакомые';
+  if (v === 0)   return '⚪ Ничего';
+  if (v >= -24)  return '😕 Лёгкая антипатия';
+  if (v >= -49)  return '😠 Неприязнь';
+  if (v >= -74)  return '😡 Враги';
+  if (v >= -99)  return '🔥 Жгучая вражда';
+  if (v >= -999) return '💀 Смертельные враги';
+  return '☠️ Заклятые враги навеки';
+}
+
+/* ===== МЕМ-ФРАЗОЧКИ ===== */
+const LOVE_MEMES = [
+  'Это не совместимость, это диагноз 😅',
+  'Такие пары называют «созданы друг для друга»',
+  'Мама, я нашёл(ла) свою судьбу!',
+  'Уже можно заказывать свадебные приглашения 💌',
+  'Гадалка была права',
+  'Звёзды сошлись, планеты выстроились в ряд',
+  'Однозначно добавить в закладки',
+  'Любовь — это когда даже калькулятор не врёт',
+  'Судьба поставила галочку напротив ваших имён',
+  'Лучше пары не найти, даже не пытайтесь'
+];
+
+const HATE_MEMES = [
+  'Беги, пока можешь 🏃',
+  'Таких лучше не сводить вместе',
+  'Врагов надо знать в лицо',
+  'Может, вы просто не поделили парту в первом классе?',
+  'Кажется, кто-то кому-то наступил на ногу... 20 лет назад',
+  'Даже калькулятор нервно моргает',
+  'Вселенная говорит: «Разойдитесь по разным углам»',
+  'Вас лучше не оставлять в одной комнате'
+];
+
+function memeFor(isHate) {
+  const list = isHate ? HATE_MEMES : LOVE_MEMES;
+  return list[Math.floor(Math.random() * list.length)];
 }
 
 function verdictFor(v) {
@@ -769,7 +975,7 @@ function animatePercent(el, target) {
 let lastResult = null;
 function capitalize(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : s; }
 
-function generateShareImage(a, b, percent, verdict, label, isHate) {
+function generateShareImage(a, b, percent, verdict, label, isHate, level, meme) {
   const W = 900, H = 900;
   const canvas = document.createElement('canvas');
   canvas.width = W; canvas.height = H;
@@ -794,9 +1000,9 @@ function generateShareImage(a, b, percent, verdict, label, isHate) {
 
   ctx.fillStyle = isHate ? '#ff5b7f' : '#d6337c';
   ctx.font = 'bold 38px "Segoe UI", sans-serif';
-  ctx.fillText('Калькулятор совместимости', W / 2, 100);
+  ctx.fillText('Калькулятор совместимости', W / 2, 80);
 
-  let namesY = 240;
+  let namesY = 220;
   if (label) {
     ctx.font = 'bold 22px "Segoe UI", sans-serif';
     const lw = ctx.measureText(label).width + 50;
@@ -804,7 +1010,7 @@ function generateShareImage(a, b, percent, verdict, label, isHate) {
     if (isHate) { lg.addColorStop(0, '#b91c3c'); lg.addColorStop(1, '#6b0018'); }
     else        { lg.addColorStop(0, '#ff9ec4'); lg.addColorStop(1, '#ff6fa8'); }
     ctx.fillStyle = lg;
-    const rx = W / 2 - lw / 2, ry = 165, rh = 44, rr = 22;
+    const rx = W / 2 - lw / 2, ry = 145, rh = 44, rr = 22;
     ctx.beginPath();
     ctx.moveTo(rx + rr, ry);
     ctx.lineTo(rx + lw - rr, ry);
@@ -818,11 +1024,11 @@ function generateShareImage(a, b, percent, verdict, label, isHate) {
     ctx.closePath(); ctx.fill();
     ctx.fillStyle = '#fff';
     ctx.fillText(label, W / 2, ry + rh / 2 + 2);
-    namesY = 265;
+    namesY = 240;
   }
 
   ctx.fillStyle = isHate ? '#ffd0e0' : '#7a3a56';
-  let nameSize = 62;
+  let nameSize = 58;
   ctx.font = 'bold ' + nameSize + 'px "Segoe UI", sans-serif';
   const namesLine = capitalize(a) + '  +  ' + capitalize(b);
   while (ctx.measureText(namesLine).width > W - 100 && nameSize > 26) {
@@ -836,23 +1042,43 @@ function generateShareImage(a, b, percent, verdict, label, isHate) {
   pg.addColorStop(0, cols.from);
   pg.addColorStop(1, cols.to);
   ctx.fillStyle = pg;
-  ctx.font = 'bold 200px "Segoe UI", sans-serif';
-  ctx.fillText(formatPercent(percent), W / 2, 480);
+  ctx.font = 'bold 190px "Segoe UI", sans-serif';
+  ctx.fillText(formatPercent(percent), W / 2, 440);
 
+  // Уровень отношений
+  ctx.fillStyle = isHate ? '#ff8fa8' : '#d6337c';
+  ctx.font = 'bold 26px "Segoe UI", sans-serif';
+  ctx.fillText(level, W / 2, 555);
+
+  // Вердикт
   ctx.fillStyle = isHate ? '#ffb0c2' : '#c9538a';
-  ctx.font = '32px "Segoe UI", sans-serif';
+  ctx.font = '28px "Segoe UI", sans-serif';
   const words = verdict.split(' ');
   const lines = []; let line = '';
   for (const w of words) {
-    if ((line + ' ' + w).trim().length > 28 && line) { lines.push(line); line = w; }
+    if ((line + ' ' + w).trim().length > 30 && line) { lines.push(line); line = w; }
     else { line = line ? line + ' ' + w : w; }
   }
   if (line) lines.push(line);
-  const startY = 620 - (lines.length - 1) * 21;
-  lines.forEach((l, i) => ctx.fillText(l, W / 2, startY + i * 42));
+  let startY = 630;
+  lines.forEach((l, i) => ctx.fillText(l, W / 2, startY + i * 36));
 
-  ctx.font = '100px "Segoe UI Emoji", "Apple Color Emoji", sans-serif';
-  ctx.fillText(isHate ? '💔' : '💗', W / 2, 810);
+  // Мем
+  ctx.fillStyle = isHate ? '#c9899a' : '#b56b8f';
+  ctx.font = 'italic 22px "Segoe UI", sans-serif';
+  const memeText = '«' + meme + '»';
+  const mWords = memeText.split(' ');
+  const mLines = []; let mline = '';
+  for (const w of mWords) {
+    if ((mline + ' ' + w).trim().length > 40 && mline) { mLines.push(mline); mline = w; }
+    else { mline = mline ? mline + ' ' + w : w; }
+  }
+  if (mline) mLines.push(mline);
+  const memeStartY = 750;
+  mLines.forEach((l, i) => ctx.fillText(l, W / 2, memeStartY + i * 30));
+
+  ctx.font = '80px "Segoe UI Emoji", "Apple Color Emoji", sans-serif';
+  ctx.fillText(isHate ? '💔' : '💗', W / 2, 855);
 
   return canvas;
 }
@@ -861,7 +1087,8 @@ async function shareResult() {
   if (!lastResult) return;
   const canvas = generateShareImage(
     lastResult.a, lastResult.b, lastResult.percent,
-    lastResult.verdict, lastResult.label, lastResult.isHate
+    lastResult.verdict, lastResult.label, lastResult.isHate,
+    lastResult.level, lastResult.meme
   );
   canvas.toBlob(async (blob) => {
     if (!blob) return;
@@ -898,8 +1125,11 @@ function calculate() {
 
   const { value, label, isHate } = getCompatibility(n1, n2);
   const verdict = isHate ? verdictForHate(value) : verdictFor(value);
+  const level   = levelFor(value);
+  const meme    = memeFor(isHate);
   const cols    = colorsForValue(value);
-  lastResult = { a: rawA || n1, b: rawB || n2, percent: value, verdict, label, isHate };
+
+  lastResult = { a: rawA || n1, b: rawB || n2, percent: value, verdict, label, isHate, level, meme };
 
   const isKatyaMatvey =
     (n1 === 'катя' && n2 === 'матвей') ||
@@ -914,8 +1144,10 @@ function calculate() {
         ${label ? `<div class="label-badge hate-badge">${label}</div>` : ''}
         <div class="percent-label">Уровень вражды</div>
         <div class="percent" id="percentEl" style="background: linear-gradient(135deg, ${cols.from}, ${cols.to}); -webkit-background-clip: text; background-clip: text;">0%</div>
+        <div class="level-badge hate-level">${level}</div>
         <div class="bar"><div class="bar-fill" id="barFill" style="background: linear-gradient(90deg, ${cols.from}, ${cols.to});"></div></div>
         <p class="verdict">${verdict}</p>
+        <p class="meme-phrase">«${meme}»</p>
       </div>
       <button class="share-btn" id="shareBtn">📸 Поделиться результатом</button>
     `;
@@ -925,8 +1157,10 @@ function calculate() {
       ${label ? `<div class="label-badge">${label}</div>` : ''}
       <div class="percent-label">Совместимость</div>
       <div class="percent" id="percentEl" style="background: linear-gradient(135deg, ${cols.from}, ${cols.to}); -webkit-background-clip: text; background-clip: text;">0%</div>
+      <div class="level-badge">${level}</div>
       <div class="bar"><div class="bar-fill" id="barFill" style="background: linear-gradient(90deg, ${cols.from}, ${cols.to});"></div></div>
       <p class="verdict">${verdict}</p>
+      <p class="meme-phrase">«${meme}»</p>
       ${isKatyaMatvey ? `
         <div class="compliment-box">
           <span class="heart-top">💌</span>
@@ -960,6 +1194,40 @@ function calculate() {
 document.getElementById('calcBtn').addEventListener('click', calculate);
 document.getElementById('name1').addEventListener('keydown', e => { if (e.key === 'Enter') calculate(); });
 document.getElementById('name2').addEventListener('keydown', e => { if (e.key === 'Enter') calculate(); });
+
+/* ================= СЧЁТЧИК ПОСЕЩЕНИЙ ================= */
+async function initVisitCounter() {
+  const el = document.getElementById('visitCount');
+  const wrap = document.getElementById('visitCounter');
+  if (!el) return;
+
+  const local = parseInt(localStorage.getItem('local_visits') || '0', 10) + 1;
+  localStorage.setItem('local_visits', local);
+
+  try {
+    const controller = new AbortController();
+    const t = setTimeout(() => controller.abort(), 4500);
+    const res = await fetch('https://api.counterapi.dev/v1/katya-matvey-love-calc/visits/up', { signal: controller.signal });
+    clearTimeout(t);
+    if (res.ok) {
+      const data = await res.json();
+      if (data && typeof data.count === 'number') {
+        el.textContent = formatNumber(data.count);
+        wrap.classList.add('loaded');
+        return;
+      }
+    }
+  } catch (e) {}
+
+  el.textContent = formatNumber(local);
+  wrap.classList.add('loaded');
+}
+
+function formatNumber(n) {
+  return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+}
+
+initVisitCounter();
 </script>
 </body>
 </html>
