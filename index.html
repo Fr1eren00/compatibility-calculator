@@ -234,6 +234,10 @@
     background: linear-gradient(135deg, #b91c3c, #6b0018);
     box-shadow: 0 4px 12px rgba(185, 28, 60, .4);
   }
+  .sad-badge {
+    background: linear-gradient(135deg, #a8a0b8, #7a6f8c);
+    box-shadow: 0 4px 12px rgba(122, 111, 140, .4);
+  }
   @keyframes badgeIn {
     from { opacity: 0; transform: scale(.8); }
     to   { opacity: 1; transform: scale(1); }
@@ -347,7 +351,6 @@
   .share-btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
   .share-btn:active { transform: scale(.97); }
 
-  /* Общие стили для обоих таймеров */
   #timer, #timerIgnat {
     margin-top: 26px; padding-top: 22px;
     border-top: 2px dashed var(--dashed);
@@ -473,11 +476,10 @@
 
     <div id="result"></div>
 
-    <!-- Таймеры Кати + Матвея -->
     <div id="timer">
       <div class="timer-section">
-        <h2>Мы вместе уже 💞</h2>
-        <p class="since">с 30 августа 2026, 21:00</p>
+        <h2>Мы были вместе 💞</h2>
+        <p class="since">с 30 августа 2026 до 8 октября 2026</p>
         <div class="timer-grid">
           <div class="timer-cell"><span class="num" id="t-days">0</span><span class="unit">дней</span></div>
           <div class="timer-cell"><span class="num" id="t-hours">00</span><span class="unit">часов</span></div>
@@ -507,7 +509,6 @@
       </div>
     </div>
 
-    <!-- Таймеры Игната + Кристины -->
     <div id="timerIgnat">
       <div class="timer-section">
         <h2>До дня рождения Игната 🎂</h2>
@@ -637,7 +638,7 @@ function popHeart(h) {
   heartPops++;
   if (heartPops >= 5 && !secretShown) {
     secretShown = true;
-    setTimeout(() => showToast('🎉 Ты нашёл(ла) секрет! Передай Кате и Матвею, что они — лучшая пара 💗'), 500);
+    setTimeout(() => showToast('🎉 Ты нашёл(ла) секрет! Передай Кате, что она — лучшее, что случалось с этим миром 💗'), 500);
   }
 
   const rect = h.getBoundingClientRect();
@@ -697,7 +698,7 @@ function showToast(msg) {
 const KATYA_COMPLIMENT = 'Катя — это человек-солнце: рядом с ней становится теплее, светлее и как-то сразу верится, что всё обязательно будет хорошо. Такие люди, как она, — редкость ☀️💗';
 
 const PAIRS = [
-  [['катя', 'матвей'],    99.7],
+  [['катя', 'матвей'],    99.7, 'мне жаль', 'sad'],
   [['катя', 'аня'],       69],
   [['дима', 'дима'],      67],
   [['артем', 'тимофей'],  0.5],
@@ -719,7 +720,7 @@ const PAIRS = [
   [['игнат', 'фиона'],    99.5, 'Шрек и Фиона'],
   [['маша', 'костя'],     99.9, 'привет вам'],
   [['вика', 'чекушка'],   101,  'любовь навеки'],
-  [['настя', 'никита'],   167,  'Никита уебище слушайся настю💕💕💕'],
+  [['настя', 'никита'],   167,  'Никита, слушайся Настю 💕💕💕'],
   [['я', 'ты'],           100,  'ну конечно 💗']
 ];
 
@@ -779,18 +780,18 @@ function randomValueFor(a, b) {
 }
 
 function getCompatibility(a, b) {
-  for (const [[x, y], value, label] of PAIRS) {
+  for (const [[x, y], value, label, badgeStyle] of PAIRS) {
     if ((a === x && b === y) || (a === y && b === x)) {
-      return { value, label: label || null, isHate: false, isRandom: false };
+      return { value, label: label || null, badgeStyle: badgeStyle || null, isHate: false, isRandom: false };
     }
   }
   for (const [[x, y], value, label] of HATE_PAIRS) {
     if ((a === x && b === y) || (a === y && b === x)) {
-      return { value, label: label || null, isHate: true, isRandom: false };
+      return { value, label: label || null, badgeStyle: null, isHate: true, isRandom: false };
     }
   }
   const rnd = randomValueFor(a, b);
-  return { value: rnd, label: null, isHate: rnd < 0, isRandom: true };
+  return { value: rnd, label: null, badgeStyle: null, isHate: rnd < 0, isRandom: true };
 }
 
 function formatPercent(v) {
@@ -887,7 +888,8 @@ function colorsForValue(v) {
 }
 
 /* ================= ТАЙМЕРЫ ================= */
-const START_DATE       = new Date(2026, 7, 30, 21, 0, 0);
+const START_DATE       = new Date(2026, 7, 30, 21, 0, 0); // 30.08.2026 21:00
+const END_DATE         = new Date(2026, 9, 8, 0, 0, 0);   // 08.10.2026 00:00 — остановка таймера «Мы вместе»
 const KATYA_BIRTH      = { year: 2008, month: 11, day: 21 };
 const MATVEY_BIRTH     = { year: 2008, month: 11, day: 14 };
 const IGNAT_BIRTH      = { year: 2009, month: 2,  day: 6 };
@@ -926,8 +928,8 @@ function renderTimer(prefix, diff) {
 }
 function updateAllTimers() {
   const now = Date.now();
-  // Катя + Матвей
-  renderTimer('t',  now - START_DATE.getTime());
+  // Катя + Матвей — «Мы вместе» остановлен на END_DATE
+  renderTimer('t',  END_DATE.getTime() - START_DATE.getTime());
   renderTimer('k',  nextBirthday(KATYA_BIRTH.month, KATYA_BIRTH.day).getTime() - now);
   renderTimer('m',  nextBirthday(MATVEY_BIRTH.month, MATVEY_BIRTH.day).getTime() - now);
   // Игнат + Кристина
@@ -1153,7 +1155,7 @@ function calculate() {
     return;
   }
 
-  const { value, label, isHate } = getCompatibility(n1, n2);
+  const { value, label, badgeStyle, isHate } = getCompatibility(n1, n2);
   const verdict = isHate ? verdictForHate(value) : verdictFor(value);
   const level   = levelFor(value);
   const meme    = memeFor(isHate);
@@ -1170,6 +1172,10 @@ function calculate() {
     ((n1 === 'кристина' || n1 === 'фиона') && n2 === 'игнат');
 
   const barWidth = Math.min(Math.abs(value), 100);
+
+  // Класс метки — обычный, «грустный» или «ненависти»
+  const badgeClass = badgeStyle === 'sad' ? 'label-badge sad-badge'
+                   : 'label-badge';
 
   if (isHate) {
     resultBox.innerHTML = `
@@ -1188,7 +1194,7 @@ function calculate() {
     heartBurst(card, 'hate');
   } else {
     resultBox.innerHTML = `
-      ${label ? `<div class="label-badge">${label}</div>` : ''}
+      ${label ? `<div class="${badgeClass}">${label}</div>` : ''}
       <div class="percent-label">Совместимость</div>
       <div class="percent" id="percentEl" style="background: linear-gradient(135deg, ${cols.from}, ${cols.to}); -webkit-background-clip: text; background-clip: text;">0%</div>
       <div class="level-badge">${level}</div>
@@ -1216,7 +1222,6 @@ function calculate() {
 
   document.getElementById('shareBtn').onclick = shareResult;
 
-  // Показываем нужный таймер (или никакой)
   if (isKatyaMatvey) {
     timerBox.classList.add('show');
     timerIgnat.classList.remove('show');
